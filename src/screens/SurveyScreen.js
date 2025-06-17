@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions, Platform, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { firestore } from '../../firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
+import { useBackgroundMusic } from '../context/BackgroundMusicContext';
 import * as Animatable from 'react-native-animatable';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons'; // Added Ionicons import
@@ -109,10 +110,21 @@ const surveyQuestions = [
 const SurveyScreen = () => {
   const navigation = useNavigation();
   const { currentUser } = useAuth();
+  const { playBackgroundMusic, stopBackgroundMusic } = useBackgroundMusic();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fadeAnim, setFadeAnim] = useState('fadeIn');
+
+  // Play background music when the survey screen mounts
+  useEffect(() => {
+    playBackgroundMusic();
+    
+    // Stop background music when the component unmounts
+    return () => {
+      stopBackgroundMusic();
+    };
+  }, []);
 
   // Check if survey was already completed
   useEffect(() => {
@@ -214,72 +226,97 @@ const SurveyScreen = () => {
   const isAnswered = answers[currentQuestion.id] !== undefined;
 
   return (
-    <LinearGradient colors={['#121212', '#000000']} style={styles.container}>
-      {/* Back button at top-left */}
-      {currentQuestionIndex > 0 && (
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={handleBack}
-        >
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      )}
-      
-      <View style={styles.progressContainer}>
-        {surveyQuestions.map((_, index) => (
-          <View 
-            key={index} 
-            style={[
-              styles.progressDot, 
-              index === currentQuestionIndex ? styles.activeDot : 
-              index < currentQuestionIndex ? styles.completedDot : {}
-            ]}
-          />
-        ))}
-      </View>
-      
-      <Animatable.View 
-        animation={fadeAnim} 
-        duration={300} 
-        style={styles.content}
+    <View style={styles.container}>
+      <ImageBackground 
+        source={require('../../assets/images/Survey_Back.webp')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
       >
-        <Text style={styles.questionNumber}>
-          Question {currentQuestionIndex + 1} of {surveyQuestions.length}
-        </Text>
+        {/* Gradient overlay for smooth fade from top to bottom */}
+        <LinearGradient 
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.3)', 'rgba(0,0,0,0.8)']} 
+          style={styles.gradientOverlay}
+        />
         
-        <Text style={styles.question}>{currentQuestion.question}</Text>
+        {/* Back button at top-left */}
+        {currentQuestionIndex > 0 && (
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={handleBack}
+          >
+            <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
         
-        <View style={styles.optionsContainer}>
-          {currentQuestion.options.map((option) => (
-            <TouchableOpacity
-              key={option.id}
+        <View style={styles.progressContainer}>
+          {surveyQuestions.map((_, index) => (
+            <View 
+              key={index} 
               style={[
-                styles.optionButton,
-                answers[currentQuestion.id] === option.id && styles.selectedOption
+                styles.progressDot, 
+                index === currentQuestionIndex ? styles.activeDot : 
+                index < currentQuestionIndex ? styles.completedDot : {}
               ]}
-              onPress={() => handleAnswer(currentQuestion.id, option.id)}
-            >
-              <BlurView intensity={80} tint="dark" style={styles.blurView}>
-                <Text style={[
-                  styles.optionText,
-                  answers[currentQuestion.id] === option.id && styles.selectedOptionText
-                ]}>
-                  {option.text}
-                </Text>
-              </BlurView>
-            </TouchableOpacity>
+            />
           ))}
         </View>
-      </Animatable.View>
-      
-      {/* Removed the navigation container with back/next buttons */}
-    </LinearGradient>
+        
+        <Animatable.View 
+          animation={fadeAnim} 
+          duration={300} 
+          style={styles.content}
+        >
+          <Text style={styles.questionNumber}>
+            Question {currentQuestionIndex + 1} of {surveyQuestions.length}
+          </Text>
+          
+          <Text style={styles.question}>{currentQuestion.question}</Text>
+          
+          <View style={styles.optionsContainer}>
+            {currentQuestion.options.map((option) => (
+              <TouchableOpacity
+                key={option.id}
+                style={[
+                  styles.optionButton,
+                  answers[currentQuestion.id] === option.id && styles.selectedOption
+                ]}
+                onPress={() => handleAnswer(currentQuestion.id, option.id)}
+              >
+                <BlurView intensity={80} tint="dark" style={styles.blurView}>
+                  <Text style={[
+                    styles.optionText,
+                    answers[currentQuestion.id] === option.id && styles.selectedOptionText
+                  ]}>
+                    {option.text}
+                  </Text>
+                </BlurView>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Animatable.View>
+        
+        {/* Removed the navigation container with back/next buttons */}
+      </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
   },
   progressContainer: {
     flexDirection: 'row',
@@ -288,6 +325,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 50 : 40,
     marginTop: 20,
     paddingBottom: 20,
+    zIndex: 2,
   },
   progressDot: {
     width: 8,
@@ -309,6 +347,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
+    zIndex: 2,
   },
   questionNumber: {
     fontSize: 16,
@@ -363,13 +402,13 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 40, // Adjusted to be below status bar
+    top: Platform.OS === 'ios' ?  60 : 40, // Adjusted to be below status bar
     left: 20,
     zIndex: 10,
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
   },

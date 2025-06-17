@@ -230,7 +230,9 @@ const History = () => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#00AEEF" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#00AEEF" />
+        </View>
       </View>
     );
   }
@@ -273,7 +275,7 @@ const History = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 0,
     backgroundColor: "transparent",
     justifyContent: "flex-start",
     paddingTop: 0,

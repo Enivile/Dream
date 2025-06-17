@@ -106,7 +106,7 @@ export default class AidsScreen extends Component {
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.mainPageScrollContainer}
+            contentContainerStyle={[styles.mainPageScrollContainer, styles.subPagesContainer]}
             onScroll={this.handleScroll}
             scrollEventThrottle={16} // Ensures smooth updates
             ref={this.scrollViewRef} // Attach reference to the ScrollView
@@ -148,6 +148,7 @@ export default class AidsScreen extends Component {
               <ScrollView
                 horizontal
                 pagingEnabled
+                contentContainerStyle={styles.subPagesContainer}
                 onScroll={this.handleSubScroll}
                 scrollEventThrottle={16}
                 ref={this.subScrollViewRef}
@@ -156,7 +157,6 @@ export default class AidsScreen extends Component {
                   this.setState({enabled:false }); }}
                   onMomentumScrollEnd={(e) => { this.setState({ enabled:true }); }}
                 onScrollEndDrag={(e) => { this.setState({ enabled:true }); }}
-                style={styles.subPagesContainer}
               >
                 <View style={styles.favouritesPage}>
                   <Favorites />
@@ -308,33 +308,41 @@ const styles = StyleSheet.create({
   },
   mainPageScrollContainer: {
     marginTop: 10,
+    flexGrow: 0,
+  },
+  subPagesContainer: {
+    flexGrow: 0,
+    alignItems: 'flex-start',
   },
   myAidsPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
-    height: ScreenHeight - 150,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   whiteNoisePage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
-    // minHeight: ScreenHeight,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   musicPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   storyPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   recentUpdatesPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   subMenuContainer: {
     alignItems: "center",
@@ -345,59 +353,67 @@ const styles = StyleSheet.create({
   favouritesPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   historyPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   favourites1Page: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
-  // subPagesContainer: {
-  //   justifyContent: 'flex-start'
-  // },
   allPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   mixesPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   rainPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   asmrPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   naturePage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
   animalPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,    
+    flexGrow: 0,
+    alignSelf: 'flex-start',    
   },
   cityPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,    
+    flexGrow: 0,
+    alignSelf: 'flex-start',    
   },
   specialPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    flex: 1,
+    flexGrow: 0,
+    alignSelf: 'flex-start',
   },
 });

@@ -31,10 +31,8 @@ const AppNavigator = () => {
   const handleExpand = () => setExpanded(true);
   const handleCollapse = () => setExpanded(false);
 
-  // Start playing background music when the app loads
-  useEffect(() => {
-    playBackgroundMusic();
-  }, []);
+  // We'll control background music in individual screens instead of app-wide
+  // This allows us to play music only on specific screens like Survey
 
   return (
     <NavigationContainer>

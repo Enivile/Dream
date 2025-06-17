@@ -2,12 +2,12 @@ import React from "react";
 import {
   ScrollView,
   StyleSheet,
-  Image,
   Dimensions,
   View,
   Text,
   TouchableOpacity,
 } from "react-native";
+import { SleepQualityGraph, DreamFrequencyGraph, MoodTrackingGraph } from '../../components/PlaceholderGraphs';
 
 const ScreenWidth = Dimensions.get("window").width;
 
@@ -46,21 +46,14 @@ const Report = () => {
         </View>
       </View>
       <ScrollView style={styles.scrollContainer}>
-        {/* Wrapper for first image */}
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.imageStyle}
-            source={require("../../../assets/images/banners/1.webp")}
-          />
-        </View>
+        {/* Sleep Quality Graph */}
+        <SleepQualityGraph />
 
-        {/* Wrapper for second image */}
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.imageStyle}
-            source={require("../../../assets/images/banners/2.webp")}
-          />
-        </View>
+        {/* Dream Frequency Graph */}
+        <DreamFrequencyGraph />
+
+        {/* Mood Tracking Graph */}
+        <MoodTrackingGraph />
       </ScrollView>
     </View>
   );
@@ -117,23 +110,7 @@ const styles = StyleSheet.create({
   selectedDayText: {
     color: "#007bff", // Blue text for selected day
   },
-  imageContainer: {
-    marginBottom: 15,
-    alignItems: "center",
-    backgroundColor: "#121212",
-    borderRadius: 10,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  imageStyle: {
-    width: ScreenWidth * 0.95,
-    height: 600,
-    resizeMode: "cover",
-  },
+
 });
 
 export default Report;

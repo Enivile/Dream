@@ -102,7 +102,7 @@ const WNnature = () => {
 
 const styles = StyleSheet.create({
   gridContainer: {
-    flex: 1,
+    flexGrow: 0,
     backgroundColor: "transparent",
     paddingHorizontal: 10,
     paddingTop: 10,

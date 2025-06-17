@@ -70,15 +70,20 @@ export const MiniPlayerProvider = ({ children }) => {
    */
   useEffect(() => {
     if (miniPlayerVisible && miniPlayerSounds.length > 0) {
-      // Load and play sounds
+      // Load sounds (but don't auto-play them)
       miniPlayerSounds.forEach(async (sound) => {
         if (!soundRefs.current[sound.id]) {
           try {
             const { sound: soundObj } = await Audio.Sound.createAsync(
               { uri: sound.uri },
-              { shouldPlay: isMiniPlayerPlaying, isLooping: true, volume: volumes[sound.id] ?? 1 }
+              { shouldPlay: false, isLooping: true, volume: volumes[sound.id] ?? 1 }
             );
             soundRefs.current[sound.id] = soundObj;
+            
+            // If player should be playing, start this sound after it's loaded
+            if (isMiniPlayerPlaying) {
+              await soundObj.playAsync();
+            }
           } catch (error) {
             console.error(`Error loading sound ${sound.id} in mini player:`, error);
           }

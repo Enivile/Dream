@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, Easing, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
+import { useBackgroundMusic } from '../context/BackgroundMusicContext';
 
 const SurveyLoaderScreen = ({ route }) => {
   const navigation = useNavigation();
+  const { stopBackgroundMusic } = useBackgroundMusic();
   const [percentage, setPercentage] = useState(0);
   const animationValue = useRef(new Animated.Value(0)).current;
   
@@ -57,6 +59,8 @@ const SurveyLoaderScreen = ({ route }) => {
 
     // Navigate to Main screen when animation completes
     const timer = setTimeout(() => {
+      // Stop background music before navigating to Main screen
+      stopBackgroundMusic();
       navigation.navigate('Main');
     }, totalDuration); // Add a small delay after animation completes
 
@@ -79,112 +83,187 @@ const SurveyLoaderScreen = ({ route }) => {
   );
 
   return (
-    <LinearGradient colors={['#121212', '#000000']} style={styles.container}>
-      <View style={styles.loaderContainer}>
-        <BlurView intensity={30} tint="dark" style={styles.blurContainer}>
-          <View style={styles.circleContainer}>
-            {/* Background circle */}
-            <View style={[styles.circleBackground, { width: circleSize, height: circleSize }]} />
-            
-            {/* Animated progress circle */}
-            <Animated.View style={styles.svgContainer}>
-              <View style={styles.circleWrapper}>
-                <Animated.View 
-                  style={[
-                    styles.progressCircle, 
-                    { 
-                      width: circleSize, 
-                      height: circleSize,
-                      borderRadius: circleSize / 2,
-                      borderWidth: 8,
-                      borderColor: 'transparent',
-                      borderTopColor: '#6200EE',
-                      transform: [{ rotate: Animated.multiply(animationValue, 3.6).interpolate({
+    <View style={styles.container}>
+      <ImageBackground 
+        source={require('../../assets/images/Survey_Back.webp')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        {/* Gradient overlay for smooth fade from top to bottom */}
+        <LinearGradient 
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.4)', 'rgba(0,0,0,0.9)']} 
+          style={styles.gradientOverlay}
+        />
+        
+        <View style={styles.loaderContainer}>
+          <BlurView intensity={40} tint="dark" style={styles.blurContainer}>
+            <View style={styles.circleContainer}>
+              {/* Background circle */}
+              <View style={[styles.circleBackground, { width: circleSize, height: circleSize }]} />
+              
+              {/* Progress ring track */}
+              <View style={[styles.progressTrack, { width: circleSize, height: circleSize }]} />
+              
+              {/* Animated progress ring */}
+              <Animated.View 
+                style={[
+                  styles.progressRing, 
+                  { 
+                    width: circleSize, 
+                    height: circleSize,
+                    borderRadius: circleSize / 2,
+                    borderWidth: 12,
+                    borderColor: 'transparent',
+                    borderTopColor: '#6200EE',
+                    borderRightColor: '#6200EE',
+                    transform: [{ 
+                      rotate: Animated.multiply(animationValue, 3.6).interpolate({
                         inputRange: [0, 360],
-                        outputRange: ['0deg', '360deg']
-                      }) }]
-                    }
-                  ]}
-                />
+                        outputRange: ['-90deg', '270deg']
+                      }) 
+                    }]
+                  }
+                ]}
+              />
+              
+              {/* Spinning animation overlay */}
+              <Animated.View 
+                style={[
+                  styles.spinningRing, 
+                  { 
+                    width: circleSize + 20, 
+                    height: circleSize + 20,
+                    borderRadius: (circleSize + 20) / 2,
+                    borderWidth: 2,
+                    borderColor: 'transparent',
+                    borderTopColor: 'rgba(98, 0, 238, 0.3)',
+                    transform: [{ 
+                      rotate: Animated.multiply(animationValue, 10).interpolate({
+                        inputRange: [0, 360],
+                        outputRange: ['0deg', '3600deg']
+                      }) 
+                    }]
+                  }
+                ]}
+              />
+              
+              {/* Percentage text */}
+              <View style={styles.percentageContainer}>
+                <Text style={styles.percentageText}>{percentage}%</Text>
+                <Text style={styles.percentageLabel}>Complete</Text>
               </View>
-            </Animated.View>
-            
-            {/* Percentage text */}
-            <View style={styles.percentageContainer}>
-              <Text style={styles.percentageText}>{percentage}%</Text>
             </View>
-          </View>
-          
-          <Text style={styles.messageText}>Analyzing your sleep profile...</Text>
-        </BlurView>
-      </View>
-    </LinearGradient>
+            
+            <Text style={styles.messageText}>Analyzing your sleep profile...</Text>
+            <Text style={styles.subMessageText}>Creating personalized recommendations</Text>
+          </BlurView>
+        </View>
+      </ImageBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
   },
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
+  },
   loaderContainer: {
-    width: 280,
-    height: 350,
-    borderRadius: 20,
+    width: 320,
+    height: 400,
+    borderRadius: 25,
     overflow: 'hidden',
-    // Glass-like effect
+    zIndex: 2,
+    // Enhanced glass-like effect
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 10,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 15,
   },
   blurContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: 30,
   },
   circleContainer: {
-    width: 200,
-    height: 200,
+    width: 220,
+    height: 220,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
   },
   circleBackground: {
     position: 'absolute',
     borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
   },
-  svgContainer: {
+  progressTrack: {
     position: 'absolute',
-    width: '100%',
-    height: '100%',
+    borderRadius: 100,
+    borderWidth: 12,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  circleWrapper: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  progressCircle: {
+  progressRing: {
     position: 'absolute',
   },
+  spinningRing: {
+    position: 'absolute',
+  },
+
   percentageContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 3,
   },
   percentageText: {
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: 'bold',
     color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  percentageLabel: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    marginTop: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   messageText: {
-    fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.8)',
+    fontSize: 18,
+    color: '#FFFFFF',
     textAlign: 'center',
+    fontWeight: '600',
+    marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  subMessageText: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.7)',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });
 

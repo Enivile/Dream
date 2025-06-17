@@ -17,6 +17,7 @@ import { useMiniPlayer } from "../../../context/MiniPlayerContext";
 /**
  * Predefined sound mixes with contextually related sounds
  * Each mix contains 3 sounds that work well together
+ * Updated to use the new sound data from WNall.js
  */
 const soundMixes = [
   {
@@ -25,8 +26,8 @@ const soundMixes = [
     icon: "leaf-outline",
     description: "Immerse yourself in peaceful forest sounds",
     sounds: [
-      { id: "3", name: "Birds", icon: "sunny-outline" },
-      { id: "25", name: "Rain Forest", icon: "leaf-outline" },
+      { id: "1", name: "Birds", icon: "sunny-outline" },
+      { id: "27", name: "Rain Forest", icon: "leaf-outline" },
       { id: "9", name: "Crickets", icon: "bug-outline" }
     ]
   },
@@ -36,9 +37,9 @@ const soundMixes = [
     icon: "rainy-outline",
     description: "Relaxing rain sounds for focus and sleep",
     sounds: [
-      { id: "23", name: "Rain", icon: "rainy-outline" },
-      { id: "27", name: "Rain In Metal Roof", icon: "home-outline" },
-      { id: "24", name: "Rain And Thunder", icon: "thunderstorm-outline" }
+      { id: "25", name: "Rain", icon: "rainy-outline" },
+      { id: "29", name: "Rain In Metal Roof", icon: "home-outline" },
+      { id: "26", name: "Rain And Thunder", icon: "thunderstorm-outline" }
     ]
   },
   {
@@ -48,8 +49,8 @@ const soundMixes = [
     description: "City sounds to create a productive atmosphere",
     sounds: [
       { id: "15", name: "Highway", icon: "car-outline" },
-      { id: "31", name: "Train", icon: "train-outline" },
-      { id: "1", name: "Keyboard", icon: "laptop-outline" }
+      { id: "35", name: "Train", icon: "train-outline" },
+      { id: "16", name: "Keyboard", icon: "laptop-outline" }
     ]
   },
   {
@@ -58,30 +59,58 @@ const soundMixes = [
     icon: "water-outline",
     description: "Calming sounds for meditation and sleep",
     sounds: [
-      { id: "18", name: "Ocean Waves", icon: "water-outline" },
-      { id: "21", name: "Pink Noise", icon: "radio-outline" },
-      { id: "7", name: "Piano", icon: "musical-notes-outline" }
+      { id: "19", name: "Ocean Waves", icon: "water-outline" },
+      { id: "23", name: "Pink Noise", icon: "radio-outline" },
+      { id: "22", name: "Piano", icon: "musical-notes-outline" }
+    ]
+  },
+  {
+    id: "mix5",
+    name: "Cozy Indoor",
+    icon: "home-outline",
+    description: "Comforting indoor sounds for relaxation",
+    sounds: [
+      { id: "4", name: "Campfire", icon: "flame-outline" },
+      { id: "6", name: "Ceiling Fan", icon: "sunny" },
+      { id: "7", name: "Clock", icon: "time-outline" }
+    ]
+  },
+  {
+    id: "mix6",
+    name: "Meditation Bliss",
+    icon: "body-outline",
+    description: "Peaceful sounds for deep meditation",
+    sounds: [
+      { id: "44", name: "Yoga Meditation", icon: "body-outline" },
+      { id: "12", name: "Guitar Meditation", icon: "musical-notes-outline" },
+      { id: "43", name: "Wind Chimes", icon: "musical-note-outline" }
     ]
   }
 ];
 
 /**
  * Mapping of sound names to their corresponding file paths in Firebase Storage.
- * Copied from WNall.js to maintain consistency
+ * Updated to use the new whiteNoises_1.0 folder and include all sounds used in mixes
  */
 const firebasePathMap = {
-  "Keyboard": "whiteNoises/Keyboard.mp3",
-  "Birds": "whiteNoises/Birds.mp3",
-  "Crickets": "whiteNoises/Crickets.mp3",
-  "Rain": "whiteNoises/Rain.mp3",
-  "Rain In Metal Roof": "whiteNoises/Rain_In_Metal_Roof.mp3",
-  "Rain And Thunder": "whiteNoises/Rain_And_Thunder.mp3",
-  "Rain Forest": "whiteNoises/Rain_Forest.mp3",
-  "Highway": "whiteNoises/Highway.mp3",
-  "Train": "whiteNoises/Train.mp3",
-  "Ocean Waves": "whiteNoises/Ocean_Waves.mp3",
-  "Pink Noise": "whiteNoises/Pink_Noise.mp3",
-  "Piano": "whiteNoises/Piano.mp3"
+  "Birds": "whiteNoises_1.0/Birds.wav",
+  "Rain Forest": "whiteNoises_1.0/Rain_Forest.wav",
+  "Crickets": "whiteNoises_1.0/Crickets.wav",
+  "Rain": "whiteNoises_1.0/Rain.wav",
+  "Rain In Metal Roof": "whiteNoises_1.0/Rain_In_Metal_Roof.wav",
+  "Rain And Thunder": "whiteNoises_1.0/Rain_And_Thunder.wav",
+  "Highway": "whiteNoises_1.0/Highway.wav",
+  "Train": "whiteNoises_1.0/Train.wav",
+  "Keyboard": "whiteNoises_1.0/Keyboard.wav",
+  "Ocean Waves": "whiteNoises_1.0/Ocean_Waves.wav",
+  "Pink Noise": "whiteNoises_1.0/Pink_Noise.wav",
+  "Piano": "whiteNoises_1.0/Piano.mp3",
+  "Campfire": "whiteNoises_1.0/Campfire.wav",
+  "Ceiling Fan": "whiteNoises_1.0/Ceiling_Fan.wav",
+  "Clock": "whiteNoises_1.0/Clock.wav",
+  "Yoga Meditation": "whiteNoises_1.0/Yoga_Meditation.wav",
+  "Guitar Meditation": "whiteNoises_1.0/Guitar_Meditation.wav",
+  "Wind Chimes": "whiteNoises_1.0/Wind_Chimes.wav"
 };
 
 const WNmixes = () => {
@@ -186,7 +215,7 @@ const WNmixes = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 0,
     backgroundColor: "#121212",
   },
   listContainer: {

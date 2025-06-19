@@ -44,7 +44,7 @@ const History = () => {
     setLoading(true);
     try {
       if (isAuthenticated && currentUser) {
-        const userHistory = await getHistory(currentUser.uid, 50); // Limit to 50 most recent items
+        const userHistory = await getHistory(currentUser.uid); // Limit to 9 most recent items (default)
         setHistory(userHistory);
       } else {
         setHistory([]);

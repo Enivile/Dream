@@ -11,8 +11,10 @@ import HomeNavigator from "./HomeNavigator";
 import MultiSoundPlayer from "../screens/Player/MultiSoundPlayer";
 import MiniPlayer from "../screens/Player/MiniPlayer";
 import MainPlayer from "../screens/Player/MainPlayer";
+import StoryPlayer from "../screens/Player/StoryPlayer";
 import Sleeppedia from "../screens/Sleeppedia";
 import InsomniaDetail from "../screens/Sleeppedia/InsomniaDetail";
+import InsomniaComprehensiveDetail from "../screens/Sleeppedia/InsomniaComprehensiveDetail";
 import HypersomniaDetail from "../screens/Sleeppedia/HypersomniaDetail";
 import SnoringDetail from "../screens/Sleeppedia/SnoringDetail";
 import BreathingDetail from "../screens/Sleeppedia/BreathingDetail";
@@ -58,8 +60,10 @@ const AppNavigator = () => {
         <Stack.Screen name="Main" component={HomeNavigator} options={{ headerShown: false }} />
         <Stack.Screen name="MainPlayer" component={MainPlayer} options={{ headerShown: false }} />
         <Stack.Screen name="Player" component={MultiSoundPlayer} options={{ headerShown: false }} />
+        <Stack.Screen name="StoryPlayer" component={StoryPlayer} options={{ headerShown: false }} />
         <Stack.Screen name="Sleeppedia" component={Sleeppedia} options={{ headerShown: false }} />
         <Stack.Screen name="InsomniaDetail" component={InsomniaDetail} options={{ headerShown: false }} />
+        <Stack.Screen name="InsomniaComprehensiveDetail" component={InsomniaComprehensiveDetail} options={{ headerShown: false }} />
         <Stack.Screen name="HypersomniaDetail" component={HypersomniaDetail} options={{ headerShown: false }} />
         <Stack.Screen name="SnoringDetail" component={SnoringDetail} options={{ headerShown: false }} />
         <Stack.Screen name="BreathingDetail" component={BreathingDetail} options={{ headerShown: false }} />

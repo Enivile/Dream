@@ -9,11 +9,9 @@ import * as FileSystem from "expo-file-system";
 import { useMiniPlayer } from "../../context/MiniPlayerContext";
 import { LinearGradient } from 'expo-linear-gradient';
 
+const screenWidth = Dimensions.get("window").width;
 
-
-  const screenWidth = Dimensions.get("window").width;
-
-  const HomePage = ({}) => {
+const HomePage = () => {
     const glowAnim = useRef(new Animated.Value(0)).current; // Initialize animated value
     const navigation = useNavigation();
     const [loadingIds, setLoadingIds] = useState([]);
@@ -307,30 +305,43 @@ import { LinearGradient } from 'expo-linear-gradient';
           {/* Header Section */}
           <View style={styles.storyHeader}>
             <Text style={styles.storyTitle}>Stories</Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('StoriesPage')}>
               <Text style={styles.storySeeAll}>See All</Text>
             </TouchableOpacity>
           </View>
           {/* Carousel Section */}
           <FlatList
-          data={items}
+          data={[
+            {
+              id: 1,
+              title: 'The Whispering Stars With Music',
+              category: 'Bedtime Story',
+              image: require('../../../assets/images/Stories/The_Whispering_Stars with Music.jpeg'),
+              duration: '15 MIN',
+              audioPath: 'Stories/The_Whispering_Stars_With_Music.mp3',
+            },
+          ]}
           horizontal
           showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <View key={item.id} style={styles.storySlide}>
+            <TouchableOpacity 
+              key={item.id} 
+              style={styles.storySlide}
+              onPress={() => navigation.navigate('StoryPlayer', { story: item })}
+              activeOpacity={0.8}
+            >
                 <Image
                   source={item.image}
                   style={styles.storyCarousel2Image}
                   resizeMode="cover"
                 />
-                <Text style={styles.storyNewBadge}>NEW</Text>
                 <View style={styles.storyTextContainer}>
                   <Text style={styles.storyCategory}>{item.category}</Text>
                   <Text style={styles.storyEntryTitle}>{item.title}</Text>
-                  <Text style={styles.storyEntryDetails}>{item.count}</Text>
+                  <Text style={styles.storyEntryDetails}>{item.duration}</Text>
                 </View>
-              </View>
+              </TouchableOpacity>
           )}
           contentContainerStyle={styles.storyCarousel}
           decelerationRate='normal' // Smooth scrolling
@@ -400,6 +411,8 @@ import { LinearGradient } from 'expo-linear-gradient';
           </View>
         </View>
         
+        {/* Spacer to prevent content from being hidden behind navbar */}
+        <View style={styles.navbarSpacer} />
       </ScrollView>
     );
 };
@@ -484,7 +497,6 @@ const styles = StyleSheet.create({
     height: 200,
   },
   image: {
-    // marginBottom: 2,
     height: 200,
     position: "absolute",
     resizeMode: 'cover',
@@ -666,28 +678,26 @@ const styles = StyleSheet.create({
     width: (screenWidth/2), // Keeps spacing consistent with paddingHorizontal
     borderRadius: 10,
     overflow: 'hidden',
-    backgroundColor: '#333',
+    backgroundColor: 'rgba(51, 51, 51, 0.8)', // Slightly darker for better contrast
     alignSelf: 'center',
     marginHorizontal: 10,
+    // Enhanced shadow for more pronounced glass-like effect
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 10,
   },
   storyCarousel2Image: {
     width: '100%',
     height: 120,
   },
-  storyNewBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: 'red',
-    color: '#FFF',
-    fontSize: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    fontWeight: 'bold',
-  },
   storyTextContainer: {
-    padding: 10,
+    padding: 15, // Increased padding for better spacing
+    backgroundColor: 'rgba(51, 51, 51, 0.6)', // Semi-transparent background for glass effect
   },
   storyCategory: {
     fontSize: 12,
@@ -698,14 +708,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFF',
+    marginBottom: 5, // Added margin for better spacing
   },
   storyEntryDetails: {
     fontSize: 12,
     color: '#CCC',
   },
-// --------------------------------------------------------------------------------------------------------------------------------------------------
   noiseContainer: {
-    // backgroundColor: '#0d1117', // Dark background
     flex: 1,
     paddingVertical: 16,
   },
@@ -735,7 +744,6 @@ const styles = StyleSheet.create({
   noiseCard: {
     alignItems: 'center',
     justifyContent: 'center',
-    // backgroundColor: '#161b22', // Dark card background
     borderRadius: 50, // Circular effect
     padding: 16,
     width: 100, // Circular size
@@ -745,7 +753,6 @@ const styles = StyleSheet.create({
   noiseRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor: '#1a1a1a', // Dark card background
     padding: 12,
     borderRadius: 10,
     marginBottom: 10,
@@ -782,8 +789,11 @@ const styles = StyleSheet.create({
   buttonPlayerIcon: {
     fontSize: 24,
     color: '#fff',
-    }
+  },
 
+  navbarSpacer: {
+    height: 65, // Same height as the navbar
+  },
 });
 
 export default HomePage;

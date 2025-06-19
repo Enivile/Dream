@@ -1,294 +1,266 @@
 # DreamApp Development History
+## MiniPlayer Buffering UI Enhancement
 
-## Journal Page Graph Placeholder Implementation
-- Replaced dummy/placeholder graph images in Report.js (journal page) with actual interactive graph components
-- Created PlaceholderGraphs.js component library with three specialized graph types:
-  - **SleepQualityGraph**: Bar chart showing sleep hours per day with statistics (average, best, lowest)
-  - **DreamFrequencyGraph**: Line chart displaying dream recording frequency with trend analysis
-  - **MoodTrackingGraph**: Horizontal bar chart showing mood distribution with color-coded legend
-- Implemented glass-like design with dark theme (#1E1E1E background) and subtle border effects
-- Added comprehensive styling with shadows, gradients, and responsive layouts
-- Enhanced visual appeal with color-coded data points and interactive-style elements
-- Removed dependency on static banner images (1.webp, 2.webp) for better performance
-- Maintained existing day selector functionality and overall page structure
-- Applied consistent design language matching the app's dark theme and glass aesthetics
-- Each graph includes relevant statistics, legends, and proper data visualization principles
+**Date:** [Current Date]
 
-## Aids Page Nested ScrollView Height Fix
-- Fixed layout issue where all inner pages in nested ScrollViews took the height of the tallest page
-- Changed all page containers from `flex: 1` to `flexGrow: 0` and `alignSelf: 'flex-start'`
-- Updated subPagesContainer style to use `flexGrow: 0` and `alignItems: 'flex-start'`
-- Fixed all inner page components that had `flex: 1` in their main container styles:
-  - WNall.js, WNcity.js, WNnature.js, WNmixes.js, WNanimal.js, WNrain.js, WNspecial.js, WNasmr.js
-  - Favorites.js and History.js (container, loadingContainer, emptyContainer styles)
-- Updated main page ScrollView to use proper flexbox properties
-- Added contentContainerStyle to nested ScrollViews to ensure proper layout
-- Each inner page now only takes up the vertical space its content requires
-- Maintained all existing nested scroll behavior and page-switching functionality
-- Applied comprehensive fix to all aid screen pages and their internal components
+**Changes:**
+- Improved the MiniPlayer UI by removing the loading spinner during buffering
+- Kept the play/pause button visible during buffering with a dimmed appearance
+- Made the play/pause button remain interactive during buffering operations
+- Used a subtle color change to indicate buffering state without disrupting the UI
 
-## Survey Loader Screen Enhancement
-- Updated SurveyLoaderScreen.js with Survey_Back.webp as full-screen background image
-- Implemented radial circular progress loader with enhanced visual design
-- Added dual-ring animation system: main progress ring and spinning overlay ring
-- Enhanced percentage display with "Complete" label and improved typography
-- Applied smooth gradient overlay from transparent (top) to semi-transparent (bottom)
-- Increased blur intensity and container size for better visual impact
-- Added text shadows for improved readability over background image
-- Enhanced glass-like effect with larger shadows and improved styling
-- Added secondary message text for better user engagement
-- Maintained all existing dummy loading logic and navigation flow
+**Benefits:**
+- Enhanced user experience by maintaining visual consistency during playback
+- Reduced UI flashing and jarring transitions when buffering occurs
+- Allowed users to continue interacting with the player even during buffering
+- Provided subtle visual feedback without interrupting the user experience
 
-## Survey Screen Background Enhancement
-- Added Survey_Back.webp as a full-screen background image to the survey screen
-- Implemented smooth gradient overlay that fades from transparent at the top to semi-transparent at the bottom
-- Enhanced visual appeal while maintaining excellent readability of all survey content
-- Updated UI element z-index values to ensure proper layering above the background
-- Improved back button visibility with enhanced background opacity
-- Maintained all existing survey functionality and user interactions
+## MiniPlayer Play/Pause Button Loading Optimization
 
-## White Noise Mixes Update
-- Updated WNmixes.js to use the new sound data from WNall.js with correct IDs and names
-- Fixed all sound references to match the updated sound library (whiteNoises_1.0 folder)
-- Updated firebasePathMap to use new file paths and extensions (.wav and .mp3)
-- Added 2 new themed mixes: "Cozy Indoor" and "Meditation Bliss" for enhanced user experience
-- Ensured all 6 mixes now use the correct sound IDs and file paths from the updated sound library
-- Maintained consistency between WNall.js and WNmixes.js sound references
+**Date:** [Current Date]
 
-## Audio Player Auto-Resume Bug Fix
-- Fixed critical bug where sounds would automatically resume playing after being paused
-- Resolved issue where play/pause buttons became unresponsive and out of sync with playback state
-- Modified MiniPlayerContext.js to prevent auto-play when loading new sounds
-- Changed Audio.Sound.createAsync to use shouldPlay: false instead of shouldPlay: isMiniPlayerPlaying
-- Added proper playback control after sound loading to maintain correct state synchronization
-- Ensured reliable pause functionality and responsive play/pause buttons on both mini and full players
+**Changes:**
+- Implemented delayed buffering indicator to prevent flashing for quick operations
+- Added timeout mechanism (150ms) before showing loading state
+- Optimized Promise handling to clear loading state as soon as first operation completes
+- Used Promise.race to make UI feel more responsive during playback toggling
+- Added proper cleanup for timeouts when component unmounts or dependencies change
+- Enhanced hideMiniPlayer function to clear any pending loading states
 
-## White Noise Sound Library Update
-- Updated white noise sound library to use new files from whiteNoises_1.0 folder (replacing old whiteNoises folder)
-- Added 8 new sound files to the collection, bringing the total to 44 sounds
-- Updated all file references to use the correct file extensions (.wav and .mp3)
-- Assigned appropriate icons to each sound based on its type
-- Fixed naming inconsistencies (e.g., "Dreaming" instead of "Draming", "Guitar Meditation" instead of "Guitar Meditaion")
+**Benefits:**
+- Significantly reduced perceived loading time when pressing play/pause
+- Eliminated UI flashing for quick operations that complete under 150ms
+- Improved responsiveness by clearing loading state as soon as possible
+- Enhanced user experience with smoother transitions between play and pause states
+- Prevented memory leaks by properly cleaning up timeouts
 
-## Background Music Optimization
-- Modified background music to only play on the Survey screen instead of starting when the app launches
-- Updated SurveyScreen.js to play music when the component mounts and stop when it unmounts
-- Updated SurveyLoaderScreen.js to stop music before navigating to the Main screen
-- Removed app-wide background music initialization from AppNavigator.js
-- Improved user experience by limiting music to only the survey flow
+## MiniPlayer Play/Pause Button Fix
 
-## Android Resource Name Fix for EAS Build
-- Fixed Android build failure in EAS caused by invalid character (hyphen) in notification sound resource name
-- Updated all references to notification sound in sleepReminderService.js to use underscore instead of hyphen
-- Ensured consistency between the actual file name (notification_sound.wav) and references in the code
-- Resolved the Gradle mergeReleaseResources task failure
+**Date:** [Current Date]
 
-## Dependency Fixes for EAS Build
-- Fixed dependency conflicts with `@expo/prebuild-config` and `@expo/metro-config`
-- Added overrides in package.json to ensure all packages use compatible versions
-- Resolved issues that were causing Gradle build failures in EAS
-- All expo-doctor checks now pass successfully
+**Changes:**
+- Enhanced error handling in MiniPlayerContext for play/pause operations
+- Added proper buffering state management during playback toggling
+- Improved visual feedback in the MiniPlayer UI for loading and buffering states
+- Added validation for sound URIs before attempting to load audio
+- Implemented graceful error recovery for failed sound loading and playback
+- Added visual styling for disabled play/pause button state
+- Improved overall reliability of the audio playback system
 
-## Tab Bar Color Update
-Updated the tab bar color to match the app's theme.
+**Benefits:**
+- Fixed issues with the play/pause button not responding correctly
+- Improved user experience with better visual feedback during loading states
+- Enhanced error recovery to prevent app crashes during playback issues
+- Made the audio playback system more robust against network and resource errors
+- Provided clear visual indication when controls are temporarily unavailable
 
-## Tab Bar Redesign
-Redesigned the tab bar with a more modern look and improved user experience.
+## HomePage Stories Integration
 
-## Background Music Implementation
-Implemented background music feature for better sleep experience.
+**Date:** [Current Date]
 
-## Survey Loader Screen Enhancement
-Enhanced the survey loader screen with better animations and user feedback.
+**Changes:**
+- Updated the Stories section in HomePage.js to display actual story content
+- Connected the Stories section to the StoryPlayer component
+- Implemented the same card design from StoriesPage in the HomePage
+- Added navigation from HomePage to StoryPlayer when a story is clicked
+- Enhanced the story cards with a glass-like look and improved styling
+- Made the "See All" button navigate to the StoriesPage
+- Replaced placeholder data with actual story data
 
-## White Noise Player UI Simplification
-Simplified the white noise player UI for better usability.
+**Benefits:**
+- Improved user experience by showing actual content instead of placeholders
+- Created a consistent look and feel between HomePage and StoriesPage
+- Enhanced discoverability of stories by making them accessible from the HomePage
+- Added functionality to the previously non-functional Stories section
 
-## Sleep Reminder Implementation
-Implemented sleep reminder functionality in the profile section:
-- Created a utility service for managing sleep reminders using expo-notifications
-- Added a modal with time picker and day selection for configuring reminders
-- Implemented glass-like UI design for the reminder modal
-- Added ability to schedule, cancel, and test notifications
-- Updated the profile UI to show the current reminder status
-- Configured notification settings in app.json
-- Added custom notification sound (notification_sound.wav) for sleep reminders
-- Updated all notification configurations to use the custom sound file
-- Added comprehensive debugging features to diagnose notification scheduling issues:
-  - Console logs throughout `scheduleSleepReminder` function to track trigger configuration and scheduling process
-  - `debugScheduledNotifications` function to log all currently scheduled notifications
-  - `isRunningInExpoGo` function to detect Expo Go limitations
-  - Debug button in Sleep Reminder Modal for easy access to notification debugging
-- Fixed notification trigger configuration to properly convert weekdays from 0-6 format to 1-7 format required by expo-notifications
-- Added explicit trigger type specification (DAILY/WEEKLY) to address potential scheduling issues
-- Fixed custom notification sound configuration:
-  - Updated notification channel to use filename without .wav extension for Android compatibility
-  - Added proper audioAttributes for notification channel (NOTIFICATION usage, SONIFICATION content type)
-  - Updated all notification content configurations to use consistent sound format
-  - Ensured app.json sounds array correctly references the full file path with extension
+## Player UI Loading Behavior Refactoring
 
-## Latest Updates
+**Date:** [Current Date]
 
-### Battery Warning Feature Re-implementation
-- **Complete Feature Re-implementation**: Re-implemented battery warning functionality with enhanced features
-- **Files Created**: 
-  - Created new `BatteryWarningModal.js` component with glass-like design
-  - Created new `batteryWarningService.js` utility service with comprehensive monitoring
-- **Profile Screen Updates**: 
-  - Added battery warning item back to settings section
-  - Added all necessary imports and state management
-  - Added battery warning modal rendering and event handlers
-  - Added battery warning icon assignment
-  - Added initialization code for battery monitoring startup
-- **Enhanced Features**: 
-  - Real-time battery level display using `expo-battery`
-  - Toggle switch to enable/disable battery warnings
-  - Slider for threshold selection (5%-50%)
-  - Test notification functionality
-  - Modern UI with glassmorphism effects
-  - Spam prevention (5-minute cooldown between warnings)
-  - Settings persistence with AsyncStorage
-  - Automatic startup and background monitoring
+**Changes:**
+- Refactored the loading indicator display in StoryPlayer and MiniPlayer components
+- Modified StoryPlayer to keep all controls visible during loading/buffering states
+- Integrated loading spinner directly into the Play/Pause button instead of replacing all controls
+- Added isLoading and isBuffering states to MiniPlayerContext for tracking audio loading states
+- Updated MiniPlayer component to show loading indicator in the play/pause button during loading/buffering
+- Improved user experience by keeping all controls accessible during loading states
+- Enhanced sound loading logic in MiniPlayerContext to properly track loading and buffering states
+- Disabled play/pause button interaction during loading/buffering states
 
-### Battery Warning UI Enhancement
-- Replaced the grid-based percentage selection with a circular slider UI:
-  - Implemented a radial progress wheel for selecting battery threshold percentage
-  - Added color gradient to visually indicate different threshold levels (red for low, blue for high)
-  - Improved user experience with intuitive drag interaction
-  - Enhanced visual feedback with clear percentage display in the center
+## StoryPlayer Seek Behavior Fix
 
-- Installed required packages:
-  - `react-native-circular-progress-indicator` for the radial slider
-  - `react-native-svg` and `react-native-reanimated` as dependencies
+**Date:** [Current Date]
 
-### Battery Warning UI Refinement
-- Replaced the circular slider with a more space-efficient wheel picker UI:
-  - Implemented a horizontal wheel picker for selecting battery threshold percentage
-  - Reduced vertical space usage to improve overall modal layout
-  - Enhanced visual feedback with highlighted selected value and faded adjacent options
-  - Maintained the same 5%-50% range with 5% increments for consistency
-  - Added haptic feedback for better user interaction
+**Changes:**
+- Fixed seek behavior in StoryPlayer to make scrubbing feel instant and smooth
+- Added isSeeking state to track when user is actively seeking
+- Prevented loading indicator from appearing during seek operations
+- Moved loading indicator to only appear in the play/pause button during buffering
+- Modified playback controls to remain visible during seeking even if buffering
+- Enhanced onPlaybackStatusUpdate to handle buffering state intelligently during seeking
+- Improved overall user experience by making seek operations feel fluid without interruptions
 
-- Installed required package:
-  - `react-native-wheel-picker-expo` for the wheel picker component
+## StoryPlayer Playback Control Fix
 
-### Battery Warning UI Simplification
-- Simplified the Battery Warning Modal UI:
-  - Removed the percentage selection UI components below the "Warning Threshold" heading
-  - Streamlined the interface for a cleaner, more minimal appearance
-  - Prepared the UI for future implementation of a different selection mechanism
+**Date:** [Current Date]
 
-### Previous Battery Warning Work (Now Removed):
-- Had implemented battery warning modal with CSS fixes for display issues
-- Had added Android compatibility with `statusBarTranslucent={true}` prop
-- Had fixed z-index and elevation issues for proper modal layering
-- Had resolved missing `expo-notifications` import issue
-- **Added Debugging Logs**: Added console.log statements to `Profile.js` handleItemPress function to track button presses and modal state changes
-- **Added Modal Debugging**: Added console.log statements to `BatteryWarningModal.js` to track when the modal receives props and when useEffect is triggered
+**Changes:**
+- Fixed issue with play/pause button not properly controlling audio playback
+- Enhanced error handling throughout the audio playback system
+- Added debugging tools to help troubleshoot playback issues
+- Improved state management to ensure UI accurately reflects playback state
+- Added visual feedback when pressing the play/pause button
+- Enhanced cleanup of audio resources when component unmounts
 
-### Battery Warning Functionality Implementation
-- **Created `batteryWarningService.js`**: Comprehensive battery monitoring service with customizable warning thresholds (5-50%) and smart notification system with 30-minute cooldown to prevent spam
-- **Created `BatteryWarningModal.js`**: Glass-like design modal with interactive slider, toggle switch, test notification feature, and real-time battery status display
-- **Updated `Profile.js`**: Integrated battery warning functionality with automatic startup if enabled, settings persistence via AsyncStorage, and status display on Profile screen
-- **Installed Dependencies**: Added `expo-battery` for cross-platform battery monitoring and `@react-native-community/slider` for the percentage selector
-- **Features**: Customizable warning percentage, notification cooldown system, test notifications, real-time battery level display, automatic monitoring startup, and comprehensive error handling
-- **Permissions**: Proper notification permission management and battery optimization handling for Android devices
+## StoryPlayer UI Simplification
 
-## Dynamic Height Management Solution for Nested ScrollViews
+**Date:** [Current Date]
 
-### Issue
-The original `AidsScreen.js` had a critical height inheritance problem:
-- All pages in the nested ScrollView structure inherited the height of the tallest page
-- Shorter content pages were unnecessarily expanded, creating poor UX
-- Fixed `flexGrow: 0` and rigid container styles prevented dynamic sizing
-- Content didn't size itself according to its actual requirements
+**Changes:**
+- Simplified the StoryPlayer loading experience with a single loader
+- Removed detailed download progress and buffering indicators
+- Configured audio to start playing automatically once buffering is complete
+- Improved user experience by hiding playback controls during loading/buffering
+- Streamlined the UI for a cleaner, more focused experience
 
-### Root Cause Analysis
-1. **Horizontal ScrollView with pagingEnabled**: Forces all child pages to have uniform dimensions
-2. **Fixed container styles**: `flexGrow: 0` and `alignSelf: 'flex-start'` prevented dynamic height adjustment
-3. **Nested structure complexity**: Triple-nested ScrollViews created height calculation conflicts
-4. **Missing height measurement**: No mechanism to track and apply content-based heights
+## Story Player Progressive Playback Enhancement
 
-### Solution: ImprovedAidsScreen Implementation
-Created `ImprovedAidsScreen.js` with dynamic height management system:
+**Date:** [Current Date]
 
-#### Key Components
-1. **DynamicPageContainer**: 
-   - Measures content height using `onLayout` event
-   - Applies dynamic height while maintaining minimum height constraints
-   - Notifies parent components of height changes
+**Changes:**
+- Enhanced StoryPlayer with progressive playback and buffering capabilities
+- Implemented streaming playback that starts immediately while downloading continues in background
+- Added visual indicators for buffering state and download progress
+- Improved caching system to save partially downloaded files for later use
+- Optimized audio loading to use local files when available
+- Added background audio playback support
 
-2. **SubSectionNavigator**: 
-   - Optimized sub-section handling with height propagation
-   - Maintains existing navigation behavior
-   - Supports both single and multi-tab scenarios
+## Story Player Implementation
 
-3. **Height Tracking System**:
-   - `sectionHeights` state tracks each section's content height
-   - Dynamic height application per section
-   - Preserves scroll behavior while allowing size flexibility
+**Date:** [Current Date]
 
-#### Technical Improvements
-- **Removed rigid constraints**: Eliminated `flexGrow: 0` from critical containers
-- **Dynamic height calculation**: Real-time content measurement and application
-- **Maintained UI flow**: Preserved existing navigation and scrolling behavior
-- **Performance optimization**: Efficient height tracking without unnecessary re-renders
-- **Responsive design**: Content adapts to actual requirements
+**Changes:**
+- Made "The Whispering Stars With Music" story banner clickable
+- Created a dedicated StoryPlayer component for playing bedtime stories
+- Implemented audio file downloading and caching from Firebase
+- Added playback controls (play/pause, skip forward/backward)
+- Added progress tracking with a slider
+- Updated AppNavigator to include the StoryPlayer screen
 
-#### Implementation Details
-```javascript
-// Dynamic height measurement
-handleLayout = (event) => {
-  const { height } = event.nativeEvent.layout;
-  if (height !== this.state.contentHeight && height > 0) {
-    this.setState({ contentHeight: height });
-    this.props.onHeightChange?.(height);
-  }
-};
+## Stories Page Banner Addition
 
-// Height application with fallback
-style={[
-  styles.dynamicContainer,
-  { minHeight },
-  contentHeight ? { height: Math.max(contentHeight, minHeight) } : {}
-]}
-```
 
-### Files Created
-- `src/screens/HomeScreens/ImprovedAidsScreen.js`
+**Date:** [Current Date]
 
-### Results
-- **Eliminated height inheritance**: Each page now sizes to its content
-- **Improved UX**: Shorter pages no longer have unnecessary whitespace
-- **Maintained functionality**: All existing navigation and scrolling preserved
-- **Better performance**: Reduced layout calculations and smoother scrolling
-- **Scalable solution**: Easy to extend for future content additions
+**Changes:**
+- Created a new `StoriesPage.js` component in the AidScreens directory
+- Added the first story banner titled "The Whispering Stars With Music"
+- Used the existing image from assets/images/Stories/The_Whispering_Stars with Music.jpeg
+- Implemented styling consistent with the Music page banners
+- Updated `AidsScreen.js` to import and render the StoriesPage component
 
-### Usage Instructions
-To implement the fix:
-1. Replace `AidsScreen` import with `ImprovedAidsScreen` in navigation
-2. The component maintains the same interface and behavior
-3. All existing functionality preserved with improved height management
+**Benefits:**
+- Enhanced the Stories page with a visually appealing banner
+- Maintained design consistency with other sections of the app
+- Improved user experience by providing visual content in the previously empty Stories section
+- Set up the foundation for future story content additions
 
-### Benefits
-- **Performance**: Significantly faster initial load and reduced memory usage
-- **Scalability**: Easy to add new sections without performance degradation
-- **Maintainability**: Cleaner architecture with separation of concerns
-- **User Experience**: Smooth loading states and responsive navigation
-- **Future-Proof**: Foundation for potential migration to React Navigation tabs
+## Sound File Reference Fix
 
-## Battery Warning Implementation
-Implemented comprehensive battery warning functionality in the profile section:
-- Created `batteryWarningService.js` utility for managing battery monitoring using expo-battery
-- Added battery level monitoring with customizable warning percentage thresholds (5-50%)
-- Implemented notification system with 30-minute cooldown to prevent spam
-- Created `BatteryWarningModal.js` component with glass-like UI design matching app theme
-- Added real-time battery status display showing current level, charging state, and low power mode
-- Integrated battery warning settings into Profile.js with toggle functionality
-- Added test notification feature for users to verify functionality
-- Implemented automatic battery monitoring startup when warnings are enabled
-- Used expo-battery API for cross-platform battery level detection and monitoring
-- Added @react-native-community/slider for intuitive percentage selection
-- Updated Profile.js to display current battery warning status and threshold percentage
-- Configured battery warning notifications to use custom notification sound
-- Added comprehensive error handling and permission management for battery monitoring
+**Date:** [Current Date]
+
+**Changes:**
+- Fixed the "Exhaust Fan" sound file reference in `WNall.js` and `WNspecial.js`
+- Corrected the filename from "Exhaust_Fan.wav" to "Exchaust_Fan.wav" in `WNall.js`
+- Corrected the filename from "Exhaust_Fan.mp3" to "Exchaust_Fan.mp3" in `WNspecial.js`
+
+**Benefits:**
+- Resolved the database lookup issue for the "Exhaust Fan" sound
+- Ensured consistent sound playback across the application
+- Improved user experience by eliminating sound loading errors
+
+**Note for Future Improvement:**
+- Consider standardizing folder paths in `WNspecial.js` and `WNall.js` for better maintainability
+
+## Navigation Bar Spacer Addition
+
+**Date:** [Current Date]
+
+**Changes:**
+- Added spacers with the same height as the navigation bar (65px) at the bottom of the following screens:
+  - HomePage
+  - AidsScreen
+  - Tracker
+  - Journal (Report)
+  - Profile
+
+**Benefits:**
+- Prevented content from being hidden behind the navigation bar
+- Improved readability of content at the bottom of each screen
+- Enhanced overall user experience by ensuring all content is visible
+- Maintained consistent layout across all main screens
+
+## HomePage.js Code Cleanup
+
+**Date:** [Current Date]
+
+**Changes:**
+- Fixed a syntax error: Added missing comma after buttonPlayerIcon style
+- Removed unnecessary whitespace and improved indentation
+- Cleaned up commented-out code and unnecessary comments
+- Fixed component declaration (removed empty props object)
+- Verified all imports are being used (ImageBackground is used in the sleeppedia section)
+
+**Benefits:**
+- Fixed potential runtime errors from syntax issues
+- Improved code readability and maintainability
+- Reduced file size by removing unnecessary comments
+- Made the code structure more consistent
+- Ensured no unused imports remain in the codebase
+
+## Profile.js Settings Cleanup
+
+**Date:** [Current Date]
+
+**Changes:**
+- Removed "Language" option from settings list
+- Removed "More" option from settings list
+- Removed corresponding icon assignments for these options
+
+**Benefits:**
+- Simplified the settings interface
+- Removed unused/unnecessary options
+- Improved user experience by focusing on essential settings only
+
+# DreamApp Development History
+## Timer Slider Smoothness Improvement (2023-07-15)
+
+**Changes:**
+- Modified the RadialTimerSelector component to only update values when the user releases the drag
+- Removed value updates during dragging to make the slider feel smoother
+- Consolidated value updates to happen only at the end of the sliding gesture
+
+**Benefits:**
+- Smoother slider interaction with less UI jitter during dragging
+- More predictable timer selection behavior
+- Improved user experience when setting timer values
+- Reduced potential performance issues from frequent updates
+
+## Theme Color Update to Bluish with Opacity (2023-07-14)
+
+**Changes:**
+- Changed the primary color to a bluish color with opacity (rgba(41, 128, 185, 0.8))
+- Updated the accent color to a lighter blue with opacity (rgba(52, 152, 219, 0.5))
+- Modified the active timer color to match the new bluish theme (rgba(41, 128, 185, 0.4))
+
+**Benefits:**
+- Enhanced glass-like appearance with semi-transparent blue colors
+- Improved visual aesthetics with a calming blue color scheme
+- Better readability with appropriate opacity levels
+- More modern and polished user interface
+
+## Theme Color Consistency Update (2023-07-13)
+
+**Changes:**
+- Changed the primary color from green (#1DB954) to purple (#892BE2) to match the app's theme
+- Updated the activeGreen color to use a purple tint (rgba(137,43,226,0.3)) for consistency- This affects all buttons and UI elements that were previously using the green color

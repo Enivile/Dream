@@ -25,12 +25,10 @@ const initialSections = [
   {
     title: "Settings",
     data: [
-      { id: "6", name: "Language", value: "Automatic" },
       { id: "7", name: "Sleep Reminder", value: "Off" },
       { id: "7.5", name: "Battery Warning", value: "Off" },
       { id: "8", name: "Rate Us", value: "" },
       { id: "9", name: "Feedback", value: "" },
-      { id: "10", name: "More", value: "" },
     ],
   },
 ];
@@ -339,12 +337,10 @@ const ProfileScreen = () => {
               // if (subItem.name === "Wake-up Mood") iconName = "happy-outline";
               
               // Settings section icons
-              if (subItem.name === "Language") iconName = "language-outline";
               if (subItem.name === "Sleep Reminder") iconName = "notifications-outline";
               if (subItem.name === "Battery Warning") iconName = "battery-half-outline";
               if (subItem.name === "Rate Us") iconName = "star-outline";
               if (subItem.name === "Feedback") iconName = "chatbubble-outline";
-              if (subItem.name === "More") iconName = "ellipsis-horizontal-outline";
               
               return (
                 <TouchableOpacity 
@@ -367,12 +363,16 @@ const ProfileScreen = () => {
             })}
           </View>
         )}
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  navbarSpacer: {
+    height: 65, // Same height as the navbar
+  },
   container: {
     flex: 1,
     backgroundColor: '#121212',

@@ -46,6 +46,9 @@ const Tracker = () => {
       <Button title="Start Recording" onPress={handleStartRecording} />
       <Button title="Stop Recording & Upload" onPress={handleStopRecording} />
       <Button title="End Session & Get Results" onPress={handleEndSession} /> */}
+      
+      {/* Spacer to prevent content from being hidden behind navbar */}
+      <View style={{ height: 65 }} />
     </View>
   );
 };

@@ -54,12 +54,18 @@ const Report = () => {
 
         {/* Mood Tracking Graph */}
         <MoodTrackingGraph />
+        
+        {/* Spacer to prevent content from being hidden behind navbar */}
+        <View style={styles.navbarSpacer} />
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  navbarSpacer: {
+    height: 65, // Same height as the navbar
+  },
   mainContainer: {
     paddingVertical: 10,
     backgroundColor: "#121212",

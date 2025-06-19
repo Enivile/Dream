@@ -28,103 +28,9 @@ import { addToFavorites, checkIsFavorite } from "../../utils/favoritesHistorySer
 import { useNavigation } from "@react-navigation/native";
 import colors from "../../theme/colors";
 import shadows from "../../theme/shadows";
+import RadialTimerSelector from "../../components/RadialTimerSelector";
 
-/**
- * TimerSlider Component
- * 
- * A precise and visually consistent slider for time selection with custom tick marks
- * 
- * @param {Object} props - Component props
- * @param {Function} props.onValueChange - Callback when value changes during sliding
- * @param {Function} props.onSlidingComplete - Callback when sliding ends and value is selected
- * @param {number} props.initialValue - Initial selected value
- * @param {number} props.minValue - Minimum selectable value
- * @param {number} props.maxValue - Maximum selectable value
- * @returns {React.ReactElement} The rendered component
- */
-const TimerSlider = ({ onValueChange, onSlidingComplete, initialValue = 30, minValue = 0, maxValue = 120 }) => {
-  const [currentValue, setCurrentValue] = useState(initialValue);
-  const { width: screenWidth } = Dimensions.get('window');
-  const sliderWidth = screenWidth * 0.8; // 80% of screen width for better control
-  
-  // Constants for tick configuration
-  const minutesPerMajorTick = 15; // Major ticks at 15-minute intervals
-  const minutesPerMinorTick = 5;  // Minor ticks at 5-minute intervals
-  
-  // Handle value change during sliding - only update visual display, don't trigger callback
-  const handleValueChange = (value) => {
-    // Round to nearest 5 minutes
-    const roundedValue = Math.round(value / minutesPerMinorTick) * minutesPerMinorTick;
-    // Only update the visual display during sliding
-    setCurrentValue(roundedValue);
-  };
-  
-  // Handle sliding complete - update value and trigger callback
-  const handleSlidingComplete = (value) => {
-    // Round to nearest 5 minutes
-    const roundedValue = Math.round(value / minutesPerMinorTick) * minutesPerMinorTick;
-    setCurrentValue(roundedValue);
-    // Only trigger the callback when sliding is complete
-    onValueChange(roundedValue);
-    onSlidingComplete(roundedValue);
-  };
-  
-  // Generate tick marks for the timeline
-  const renderTicks = () => {
-    const ticks = [];
-    const tickCount = (maxValue - minValue) / minutesPerMinorTick + 1;
-    const tickWidth = sliderWidth / (tickCount - 1);
-    
-    for (let i = 0; i < tickCount; i++) {
-      const value = minValue + (i * minutesPerMinorTick);
-      const isMajorTick = value % minutesPerMajorTick === 0; // Every 15 minutes is a major tick
-      const leftPosition = (i / (tickCount - 1)) * 100; // Position as percentage
-      
-      ticks.push(
-        <View 
-          key={i} 
-          style={[
-            styles.timelineTick,
-            isMajorTick && styles.timelineMajorTick,
-            { left: `${leftPosition}%` }
-          ]}
-        >
-          {isMajorTick && (
-            <Text style={styles.timelineTickLabel}>{value}</Text>
-          )}
-        </View>
-      );
-    }
-    
-    return ticks;
-  };
-  
-  return (
-    <View style={styles.timerSliderContainer}>
-      <View style={styles.ticksContainer}>
-        {renderTicks()}
-      </View>
-      
-      <Slider
-        style={styles.slider}
-        minimumValue={minValue}
-        maximumValue={maxValue}
-        value={currentValue}
-        onValueChange={handleValueChange}
-        onSlidingComplete={handleSlidingComplete}
-        minimumTrackTintColor="transparent" // Transparent fill color
-        maximumTrackTintColor="transparent" // Transparent track color
-        thumbTintColor="rgba(138,43,226,0.9)"
-        step={minutesPerMinorTick} // Snap to 5-minute intervals
-        tapToSeek={true} // Allow tapping on track to seek
-      />
-      
-      <Text style={styles.currentValueText}>
-        {currentValue} <Text style={styles.minutesText}>min</Text>
-      </Text>
-    </View>
-  );
-};
+
 /**
  * MultiSoundPlayer Component
  * 
@@ -160,6 +66,7 @@ const MultiSoundPlayer = ({ sounds, onRemoveSound, onClose }) => {
   const [timerDuration, setTimerDuration] = useState(null);
   const [timerEndTime, setTimerEndTime] = useState(null);
   const [timerRemaining, setTimerRemaining] = useState(null);
+
 
   /**
    * Effect hook to synchronize the component with MiniPlayerContext
@@ -401,16 +308,16 @@ const MultiSoundPlayer = ({ sounds, onRemoveSound, onClose }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Set Timer</Text>
             
-            {/* Modal title */}
-            
-            {/* Timer slider for time selection */}
-            <View style={styles.timelineContainer}>
-              <TimerSlider 
+            {/* Timer selector */}
+            <View style={styles.timerSelectorContainer}>
+              <RadialTimerSelector
                 onValueChange={handleSliderChange}
-                onSlidingComplete={handleSliderComplete}
+                onSelectionComplete={handleSliderComplete}
                 initialValue={timerDuration || 30}
                 minValue={0}
                 maxValue={120}
+                snapInterval={5}
+                size={260}
               />
             </View>
             
@@ -450,22 +357,25 @@ const MultiSoundPlayer = ({ sounds, onRemoveSound, onClose }) => {
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
         
-        {/* Minimize button - switches to mini player */}
-        <TouchableOpacity onPress={handleMinimize} style={styles.floatingButton}>
-          <Ionicons name="remove" size={24} color="#fff" />
-        </TouchableOpacity>
-        
-        {/* Close button - completely closes the player */}
-        <TouchableOpacity
-          onPress={() => {
-            hideMiniPlayer();
-            setMainPlayerVisible(false);
-            if (onClose) onClose();
-          }}
-          style={styles.floatingButton}
-        >
-          <Ionicons name="close" size={24} color="#fff" />
-        </TouchableOpacity>
+        {/* Right side buttons container */}
+        <View style={styles.rightButtonsContainer}>
+          {/* Minimize button - switches to mini player */}
+          <TouchableOpacity onPress={handleMinimize} style={[styles.floatingButton, styles.rightButton]}>
+            <Ionicons name="remove" size={24} color="#fff" />
+          </TouchableOpacity>
+          
+          {/* Close button - completely closes the player and clears sounds */}
+          <TouchableOpacity
+            onPress={() => {
+              hideMiniPlayer(true); // Pass true to clear sounds array
+              setMainPlayerVisible(false);
+              if (onClose) onClose();
+            }}
+            style={[styles.floatingButton, styles.rightButton]}
+          >
+            <Ionicons name="close" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
       
       <View style={styles.playerContainer}>
@@ -534,7 +444,7 @@ const MultiSoundPlayer = ({ sounds, onRemoveSound, onClose }) => {
           <Ionicons name="timer-outline" size={24} color="#fff" />
           {timerRemaining && (
             <View style={styles.timerBadge}>
-              <Text style={styles.timerText}>{formatTimeRemaining(timerRemaining)}</Text>
+              <Text style={styles.timerText}>{Math.ceil(timerRemaining / 60000)}m</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -567,6 +477,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 20,
     zIndex: 1100,
+  },
+  rightButtonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  rightButton: {
+    marginLeft: 10,
   },
   floatingButton: {
     backgroundColor: "rgba(35,35,35,0.8)",
@@ -646,11 +563,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 30,
   },
   timerText: {
     color: colors.whiteText,
     fontSize: 10,
     fontWeight: "bold",
+    textAlign: "center",
   },
   modalOverlay: {
     flex: 1,
@@ -667,92 +589,23 @@ const styles = StyleSheet.create({
     ...shadows.medium,
     borderWidth: 1,
     borderColor: colors.semiTransparentWhite,
+    maxHeight: "85%",
   },
   modalTitle: {
     color: colors.whiteText,
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 30,
+    marginBottom: 20,
     textTransform: "uppercase",
     letterSpacing: 1,
   },
-  timerDisplayText: {
-    color: colors.whiteText,
-    fontSize: 48,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    textShadowColor: "rgba(138,43,226,0.6)",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-  },
-  timerUnitText: {
-    fontSize: 24,
-    marginLeft: 5,
-    opacity: 0.8,
-  },
-  timelineContainer: {
+
+  timerSelectorContainer: {
     width: "100%",
-    height: 120,
+    alignItems: "center",
     marginBottom: 20,
-    position: "relative",
-    alignItems: "center",
   },
-  timerSliderContainer: {
-    width: "100%",
-    height: 120,
-    position: "relative",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  slider: {
-    width: "92%",
-    height: 40,
-    marginVertical: 10,
-  },
-  ticksContainer: {
-    position: "absolute",
-    top: 4,
-    left: "10%",
-    right: "10%",
-    height: 50,
-    width: "80%",
-  },
-  timelineTick: {
-    position: "absolute",
-    width: 0.5,
-    height: 15,
-    backgroundColor: colors.greyText,
-    top: 0,
-  },
-  timelineMajorTick: {
-    height: 25,
-    width: 1,
-    backgroundColor: colors.whiteText,
-  },
-  timelineTickLabel: {
-    color: colors.softWhite,
-    fontSize: 12,
-    position: "absolute",
-    top: 30,
-    width: 30,
-    textAlign: "center",
-    marginLeft: -15,
-  },
-  currentValueText: {
-    color: colors.whiteText,
-    fontSize: 36,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 5,
-    textShadowColor: "rgba(138,43,226,0.6)",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-  },
-  minutesText: {
-    fontSize: 20,
-    opacity: 0.8,
-  },
+
   startButton: {
     backgroundColor: colors.accent,
     paddingVertical: 15,

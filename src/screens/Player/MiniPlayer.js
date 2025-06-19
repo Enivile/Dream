@@ -10,7 +10,7 @@
  */
 
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useMiniPlayer } from "../../context/MiniPlayerContext";
 import { useNavigation } from "@react-navigation/native";
@@ -28,6 +28,8 @@ const MiniPlayer = ({ onExpand }) => {
     miniPlayerVisible,      // Boolean indicating if mini player should be shown
     miniPlayerSounds,       // Array of sound objects currently loaded
     isMiniPlayerPlaying,    // Boolean indicating if sounds are currently playing
+    isLoading,              // Boolean indicating if sounds are loading
+    isBuffering,            // Boolean indicating if sounds are buffering
     toggleMiniPlayerPlay,   // Function to toggle play/pause state
     hideMiniPlayer,         // Function to hide the mini player
     showMiniPlayer,         // Function to show the mini player
@@ -47,12 +49,21 @@ const MiniPlayer = ({ onExpand }) => {
       {/* Display information about the currently playing sound(s) */}
       <View style={styles.infoRow}>
         {/* Play/Pause button - toggles between play and pause icons based on state */}
-        <TouchableOpacity onPress={toggleMiniPlayerPlay} style={styles.playPauseBtn}>
-          <Ionicons 
-            name={isMiniPlayerPlaying ? "pause" : "play"} 
-            size={22} 
-            color="#fff" 
-          />
+        <TouchableOpacity 
+          onPress={toggleMiniPlayerPlay} 
+          style={[styles.playPauseBtn, (isLoading) && styles.playPauseBtnDisabled]}
+          disabled={isLoading}
+          activeOpacity={isLoading ? 1 : 0.7}
+        >
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Ionicons 
+              name={isMiniPlayerPlaying ? "pause" : "play"} 
+              size={22} 
+              color={isBuffering ? "rgba(255,255,255,0.5)" : "#fff"} 
+            />
+          )}
         </TouchableOpacity>
         {/* Display the name of the sound(s) - if multiple sounds, show count */}
         <Text style={styles.text} numberOfLines={1}>
@@ -74,8 +85,8 @@ const MiniPlayer = ({ onExpand }) => {
         style={styles.iconBtn}>
           <Ionicons name="options-outline" size={22} color="#fff" />
         </TouchableOpacity>
-        {/* Close button - hides the mini player */}
-        <TouchableOpacity onPress={hideMiniPlayer} style={styles.iconBtn}>
+        {/* Close button - hides the mini player and clears sounds */}
+        <TouchableOpacity onPress={() => hideMiniPlayer(true)} style={styles.iconBtn}>
           <Ionicons name="close" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -144,6 +155,10 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: "center",
     justifyContent: "center",
+  },
+  playPauseBtnDisabled: {
+    backgroundColor: "rgba(255,255,255,0.05)", // Dimmer background when disabled
+    opacity: 0.8, // Slightly transparent to indicate disabled state
   }
 });
 

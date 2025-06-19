@@ -24,7 +24,7 @@ const firebasePathMap = {
   "Ceiling Fan": "whiteNoises/Ceiling_Fan.mp3",
   "Piano": "whiteNoises/Piano.mp3",
   "Computer Fan": "whiteNoises/Computer_Fan.mp3",
-  "Exhaust Fan": "whiteNoises/Exhaust_Fan.mp3",
+  "Exhaust Fan": "whiteNoises/Exchaust_Fan.mp3",
   "Old Fan": "whiteNoises/Old_Fan.mp3",
   "Pink Noise": "whiteNoises/Pink_Noise.mp3",
   "Small Desk Fan": "whiteNoises/Small_Desk_Fan.mp3"

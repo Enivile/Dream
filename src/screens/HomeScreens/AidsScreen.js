@@ -10,8 +10,10 @@ import WNcity from "./AidScreens/WNcity";
 import WNspecial from "./AidScreens/WNspecial";
 import RecentlyUpdatedPage from "./AidScreens/RecentlyUpdatedPage";
 import MusicPage from "./AidScreens/MusicPage";
+import StoriesPage from "./AidScreens/StoriesPage";
 import Favorites from "./AidScreens/Favorites";
 import History from "./AidScreens/History";
+import MyAids from "./AidScreens/MyAids";
 
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
@@ -255,10 +257,12 @@ export default class AidsScreen extends Component {
             </View>
 
             <View style={styles.musicPage}><MusicPage /></View>
-            <View style={styles.storyPage}></View>
+            <View style={styles.storyPage}><StoriesPage /></View>
             <View style={styles.recentUpdatesPage}><RecentlyUpdatedPage /></View>
           </ScrollView>
         </ImageBackground>
+        {/* Spacer to prevent content from being hidden behind navbar */}
+        <View style={styles.navbarSpacer} />
       </ScrollView>
     );
   }
@@ -268,6 +272,9 @@ const getRandomColor = () =>
   `rgb(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)})`;
 
 const styles = StyleSheet.create({
+  navbarSpacer: {
+    height: 65, // Same height as the navbar
+  },
   mainContainer: {
     backgroundColor: "#121212",
   },

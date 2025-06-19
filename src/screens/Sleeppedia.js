@@ -10,36 +10,42 @@ const { width } = Dimensions.get('window');
 const blogData = [
   {
     id: '1',
+    title: 'Understanding Insomnia: Complete Guide',
+    image: require('../../assets/images/Blogs/Insomnia 1.jpg'),
+    route: 'InsomniaComprehensiveDetail'
+  },
+  {
+    id: '2',
     title: 'Insomnia',
     image: require('../../assets/images/Blogs/Insomnia 1.jpg'),
     route: 'InsomniaDetail'
   },
   {
-    id: '2',
+    id: '3',
     title: 'Hypersomnia',
     image: require('../../assets/images/Blogs/Insomnia 1.jpg'),
     route: 'HypersomniaDetail'
   },
   {
-    id: '3',
+    id: '4',
     title: 'Snoring',
     image: require('../../assets/images/Blogs/Insomnia 2.jpg'),
     route: 'SnoringDetail'
   },
   {
-    id: '4',
+    id: '5',
     title: 'Breathing abnormal pauses while sleeping',
     image: require('../../assets/images/Blogs/Insomnia 2.jpg'),
     route: 'BreathingDetail'
   },
   {
-    id: '5',
+    id: '6',
     title: 'Bruxism',
     image: require('../../assets/images/Blogs/Insomnia 2.jpg'),
     route: 'BruxismDetail'
   },
   {
-    id: '6',
+    id: '7',
     title: 'RestlessLeg',
     image: require('../../assets/images/Blogs/Insomnia 2.jpg'),
     route: 'RestlessLegDetail'

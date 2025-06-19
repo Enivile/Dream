@@ -7,7 +7,7 @@
  */
 
 import { firestore } from "../../firebaseConfig";
-import { collection, doc, setDoc, getDoc, getDocs, deleteDoc, query, orderBy, limit, serverTimestamp, addDoc } from "firebase/firestore";
+import { collection, doc, setDoc, getDoc, getDocs, deleteDoc, query, orderBy, limit, serverTimestamp, addDoc, where } from "firebase/firestore";
 
 /**
  * Add a sound to a user's favorites collection
@@ -124,22 +124,44 @@ export const getFavorites = async (userId) => {
 };
 
 /**
- * Add a sound to a user's play history
+ * Add a sound to play history
  * 
  * @param {string} userId - The ID of the current user
- * @param {Object} sound - The sound object that was played
+ * @param {Object} sound - The sound object to add to history
  * @returns {Promise<string>} - The ID of the newly created history document
  */
 export const addToHistory = async (userId, sound) => {
   try {
     if (!userId) throw new Error("User must be logged in to record history");
+    if (!sound) throw new Error("Sound object is required");
     
     // Create a reference to the user's history collection
     const historyRef = collection(firestore, "users", userId, "history");
     
+    // Use a safe identifier - prefer title, fallback to name or id
+    const soundIdentifier = sound.title || sound.name || sound.id;
+    
+    // Only proceed if we have a valid identifier
+    if (soundIdentifier) {
+      // Check if this sound already exists in history and remove previous entries
+      const existingQuery = query(historyRef, where("title", "==", soundIdentifier));
+      const existingSnapshot = await getDocs(existingQuery);
+      
+      // Remove all existing entries for this sound
+      const deletePromises = [];
+      existingSnapshot.forEach((doc) => {
+        deletePromises.push(deleteDoc(doc.ref));
+      });
+      
+      if (deletePromises.length > 0) {
+        await Promise.all(deletePromises);
+      }
+    }
+    
     // Add the sound to the history collection with a timestamp
     const historyData = {
       ...sound,
+      title: soundIdentifier || "Unknown", // Ensure title is always set
       playedAt: serverTimestamp(),
       type: sound.sounds ? "mix" : "sound" // Determine if it's a single sound or a mix
     };
@@ -157,14 +179,14 @@ export const addToHistory = async (userId, sound) => {
  * Get play history for a user
  * 
  * @param {string} userId - The ID of the current user
- * @param {number} limit - Maximum number of history items to retrieve (default: 50)
+ * @param {number} limit - Maximum number of history items to retrieve (default: 9)
  * @returns {Promise<Array>} - Array of history sound objects
  */
-export const getHistory = async (userId, limitCount = 50) => {
+export const getHistory = async (userId, limitCount = 9) => {
   try {
     if (!userId) return [];
     
-    // Get the user's history, ordered by when they were played
+    // Get the user's history, ordered by when they were played (limit to 9 entries, latest first)
     const historyRef = collection(firestore, "users", userId, "history");
     const q = query(historyRef, orderBy("playedAt", "desc"), limit(limitCount));
     const historySnapshot = await getDocs(q);

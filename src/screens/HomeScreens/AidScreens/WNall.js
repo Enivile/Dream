@@ -83,7 +83,7 @@ const firebasePathMap = {
   "Computer Fan": "whiteNoises_1.0/Computer_Fan.wav",
   "Crickets": "whiteNoises_1.0/Crickets.wav",
   "Dreaming": "whiteNoises_1.0/Dreaming.wav",
-  "Exhaust Fan": "whiteNoises_1.0/Exhaust_Fan.wav",
+  "Exhaust Fan": "whiteNoises_1.0/Exchaust_Fan.wav",
   "Guitar Meditation": "whiteNoises_1.0/Guitar_Meditation.wav",
   "Hand Dryer": "whiteNoises_1.0/Hand_Dryer.wav",
   "Heavy Rain": "whiteNoises_1.0/Heavy_Rain.wav",

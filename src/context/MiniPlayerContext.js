@@ -49,6 +49,10 @@ export const MiniPlayerProvider = ({ children }) => {
   // Global play/pause state for all sounds
   const [isMiniPlayerPlaying, setIsMiniPlayerPlaying] = useState(true);
   
+  // Loading and buffering states for audio
+  const [isLoading, setIsLoading] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
+  
   // Object mapping sound IDs to their volume levels (0.0 to 1.0)
   const [volumes, setVolumes] = useState({});
   
@@ -70,41 +74,140 @@ export const MiniPlayerProvider = ({ children }) => {
    */
   useEffect(() => {
     if (miniPlayerVisible && miniPlayerSounds.length > 0) {
+      // Set loading state to true when starting to load sounds
+      setIsLoading(true);
+      
+      // Track successful loads to determine if we should show the player
+      let successfulLoads = 0;
+      
       // Load sounds (but don't auto-play them)
-      miniPlayerSounds.forEach(async (sound) => {
+      const loadPromises = miniPlayerSounds.map(async (sound) => {
         if (!soundRefs.current[sound.id]) {
           try {
+            // Validate the URI before attempting to load
+            if (!sound.uri) {
+              console.error(`Missing URI for sound ${sound.id}`);
+              return;
+            }
+            
             const { sound: soundObj } = await Audio.Sound.createAsync(
               { uri: sound.uri },
-              { shouldPlay: false, isLooping: true, volume: volumes[sound.id] ?? 1 }
+              { shouldPlay: false, isLooping: true, volume: volumes[sound.id] ?? 1 },
+              // Add status update callback to track buffering
+              (status) => {
+                if (status.isBuffering) {
+                  setIsBuffering(true);
+                } else if (!status.isBuffering && status.isLoaded) {
+                  setIsBuffering(false);
+                }
+                
+                // Handle playback errors
+                if (status.error) {
+                  console.error(`Playback error for sound ${sound.id}:`, status.error);
+                }
+              }
             );
-            soundRefs.current[sound.id] = soundObj;
             
-            // If player should be playing, start this sound after it's loaded
+            soundRefs.current[sound.id] = soundObj;
+            successfulLoads++;
+            
+            // If playing, start playback
             if (isMiniPlayerPlaying) {
-              await soundObj.playAsync();
+              try {
+                await soundObj.playAsync();
+              } catch (playError) {
+                console.error(`Error playing sound ${sound.id}:`, playError);
+                // Continue even if playback fails
+              }
             }
           } catch (error) {
-            console.error(`Error loading sound ${sound.id} in mini player:`, error);
+            console.error(`Error loading sound ${sound.id}:`, error);
+            // Continue with other sounds even if one fails
           }
+        } else {
+          // Sound already loaded
+          successfulLoads++;
         }
       });
+      
+      // Set loading to false when all sounds are loaded
+      Promise.all(loadPromises)
+        .then(() => {
+          setIsLoading(false);
+          
+          // If no sounds loaded successfully, hide the mini player
+          if (successfulLoads === 0 && miniPlayerSounds.length > 0) {
+            console.warn("No sounds loaded successfully, hiding mini player");
+            setMiniPlayerVisible(false);
+          }
+        })
+        .catch(error => {
+          console.error("Error loading sounds:", error);
+          setIsLoading(false);
+        });
     }
-  }, [miniPlayerSounds, miniPlayerVisible]);
+  }, [miniPlayerSounds, miniPlayerVisible, volumes, isMiniPlayerPlaying]);
 
   /**
    * Effect hook to handle global play/pause state changes
    * When isMiniPlayerPlaying changes, all sounds are played or paused accordingly
    */
   useEffect(() => {
+    // Only proceed if mini player is visible and we have sounds to control
     if (miniPlayerVisible && Object.keys(soundRefs.current).length > 0) {
-      const actions = Object.values(soundRefs.current).map((soundObj) =>
-        isMiniPlayerPlaying ? soundObj.playAsync() : soundObj.pauseAsync()
-      );
-      Promise.all(actions).catch(error => {
-        console.error("Error toggling mini player sounds:", error);
+      // Create an array of promises for each sound operation
+      const actions = Object.values(soundRefs.current).map((soundObj) => {
+        try {
+          // Determine whether to play or pause based on state
+          const operation = isMiniPlayerPlaying ? 
+            soundObj.playAsync() : 
+            soundObj.pauseAsync();
+          
+          // Return the operation promise
+          return operation;
+        } catch (error) {
+          console.error("Error toggling sound playback:", error);
+          return Promise.resolve(); // Return a resolved promise to prevent Promise.all from failing
+        }
       });
+      
+      // Use Promise.race to clear the buffering state as soon as the first operation completes
+      // This makes the UI feel more responsive
+      Promise.race(actions)
+        .then(() => {
+          // Clear any pending buffering timeout
+          if (bufferingTimeoutRef.current) {
+            clearTimeout(bufferingTimeoutRef.current);
+            bufferingTimeoutRef.current = null;
+          }
+          
+          // Clear buffering state when at least one operation completes
+          setIsBuffering(false);
+        })
+        .catch(error => {
+          console.error("Error in first sound operation:", error);
+        });
+      
+      // Still use Promise.all to ensure all operations complete
+      Promise.all(actions)
+        .catch(error => {
+          console.error("Error toggling mini player sounds:", error);
+          setIsBuffering(false);
+        });
+    } else {
+      // If mini player is not visible or no sounds are loaded,
+      // make sure we clear any pending buffering state
+      setIsBuffering(false);
     }
+    
+    // Cleanup function to clear any pending timeouts when component unmounts
+    // or when dependencies change
+    return () => {
+      if (bufferingTimeoutRef.current) {
+        clearTimeout(bufferingTimeoutRef.current);
+        bufferingTimeoutRef.current = null;
+      }
+    };
   }, [isMiniPlayerPlaying, miniPlayerVisible]);
 
   /**
@@ -178,15 +281,33 @@ export const MiniPlayerProvider = ({ children }) => {
 
   /**
    * Hides the mini player and stops playback
-   * Note: This doesn't clear the sounds array so they can be restored when minimized
+   * When called from the mini player's close button, it clears the sounds array
+   * When called from minimizing the main player, it preserves the sounds array
+   * 
+   * @param {boolean} clearSounds - Whether to clear the sounds array (default: false)
    */
-  const hideMiniPlayer = () => {
+  const hideMiniPlayer = (clearSounds = false) => {
+    // Clear any pending buffering timeout to prevent UI flashing
+    if (bufferingTimeoutRef.current) {
+      clearTimeout(bufferingTimeoutRef.current);
+      bufferingTimeoutRef.current = null;
+    }
+    
+    // Clear buffering state immediately
+    setIsBuffering(false);
+    
+    // Update player state
     setMiniPlayerVisible(false);
     setIsMiniPlayerPlaying(false);
+    
     // Reset the history tracking when player is hidden
     setAddedToHistory({});
-    // Don't clear the sounds array so they can be restored when main player is minimized
-    // setMiniPlayerSounds([]);
+    
+    // Clear the sounds array if explicitly requested (e.g., when closing the player)
+    if (clearSounds) {
+      setMiniPlayerSounds([]);
+    }
+    // Otherwise, don't clear the sounds array so they can be restored when main player is minimized
   };
 
   /**
@@ -198,11 +319,31 @@ export const MiniPlayerProvider = ({ children }) => {
     setMiniPlayerSounds(sounds);
   };
 
+  // Ref to store buffering timeout ID
+  const bufferingTimeoutRef = useRef(null);
+  
   /**
    * Toggles the play/pause state of all sounds in the mini player
+   * Uses a delayed buffering indicator to avoid flashing for quick operations
    */
   const toggleMiniPlayerPlay = () => {
+    // Clear any existing timeout
+    if (bufferingTimeoutRef.current) {
+      clearTimeout(bufferingTimeoutRef.current);
+    }
+    
+    // Only show buffering indicator if operation takes longer than 150ms
+    // This prevents the indicator from flashing for quick operations
+    bufferingTimeoutRef.current = setTimeout(() => {
+      setIsBuffering(true);
+      bufferingTimeoutRef.current = null;
+    }, 150);
+    
+    // Toggle the play state immediately
     setIsMiniPlayerPlaying((prev) => !prev);
+    
+    // Note: The actual play/pause operations are handled in the useEffect
+    // that watches for changes to isMiniPlayerPlaying
   };
   
   /**
@@ -247,17 +388,19 @@ export const MiniPlayerProvider = ({ children }) => {
         miniPlayerVisible,
         miniPlayerSounds,
         isMiniPlayerPlaying,
+        isLoading,
+        isBuffering,
         showMiniPlayer,
         hideMiniPlayer,
         updateMiniPlayerSounds,
         toggleMiniPlayerPlay,
-        soundRefs,
-        volumes,
         handleVolumeChange,
         removeSoundFromMiniPlayer,
         mainPlayerVisible,
         setMainPlayerVisible,
-        setMiniPlayerVisible, 
+        setMiniPlayerVisible,
+        volumes,
+        soundRefs,
       }}
     >
       {children}

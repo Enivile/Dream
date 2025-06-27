@@ -60,6 +60,7 @@ const MusicPage = () => {
           )}
           contentContainerStyle={styles.recentlyUpdatedCarousel}
           decelerationRate='normal' // Smooth scrolling
+          ListFooterComponent={<View style={styles.navbarSpacer} />}
         />
         </View>
   );
@@ -135,6 +136,9 @@ const MusicPage = () => {
   recentlyUpdatedEntryDetails: {
     fontSize: 12,
     color: '#CCC',
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 
     });

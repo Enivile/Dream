@@ -51,7 +51,7 @@ const MiniPlayer = ({ onExpand }) => {
         {/* Play/Pause button - toggles between play and pause icons based on state */}
         <TouchableOpacity 
           onPress={toggleMiniPlayerPlay} 
-          style={[styles.playPauseBtn, (isLoading) && styles.playPauseBtnDisabled]}
+          style={[styles.playPauseBtn, (isLoading || isBuffering) && styles.playPauseBtnDisabled]}
           disabled={isLoading}
           activeOpacity={isLoading ? 1 : 0.7}
         >

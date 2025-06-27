@@ -228,6 +228,7 @@ const Favorites = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderFavoriteItem}
         contentContainerStyle={styles.listContainer}
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
@@ -348,6 +349,9 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 });
 

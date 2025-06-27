@@ -93,6 +93,7 @@ const WNrain = () => {
           </View>
         )}
         contentContainerStyle={styles.gridListContainer}
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
@@ -124,6 +125,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: "center",
     paddingHorizontal: 5,
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 });
 

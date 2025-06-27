@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, Image, Dimensions } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomePage from "../screens/HomeScreens/HomePage";
-import AidsScreen from "../screens/HomeScreens/AidsScreen";
+import AidsScreen from "../screens/HomeScreens/ImprovedAidsScreen";
 import { Ionicons } from "@expo/vector-icons";
 import Tracker from "../screens/HomeScreens/Tracker";
 import Report from "../screens/HomeScreens/Report"

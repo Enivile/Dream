@@ -57,6 +57,7 @@ const StoriesPage = () => {
         )}
         contentContainerStyle={styles.storiesCarousel}
         decelerationRate='normal'
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
@@ -121,6 +122,9 @@ const styles = StyleSheet.create({
   storyDetails: {
     fontSize: 12,
     color: '#CCC',
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 });
 

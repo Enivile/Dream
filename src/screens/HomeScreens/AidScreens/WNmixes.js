@@ -208,6 +208,7 @@ const WNmixes = () => {
           </TouchableOpacity>
         )}
         contentContainerStyle={styles.listContainer}
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
@@ -283,6 +284,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#00AEEF",
     justifyContent: "center",
     alignItems: "center",
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 });
 

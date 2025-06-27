@@ -7,6 +7,9 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import { SleepQualityGraph, DreamFrequencyGraph, MoodTrackingGraph } from '../../components/PlaceholderGraphs';
 
 const ScreenWidth = Dimensions.get("window").width;
@@ -46,6 +49,23 @@ const Report = () => {
         </View>
       </View>
       <ScrollView style={styles.scrollContainer}>
+        {/* Placeholder Message */}
+        <View style={styles.placeholderMessageContainer}>
+          <BlurView intensity={30} tint="dark" style={styles.blurContainer}>
+            <LinearGradient
+              colors={['rgba(78, 205, 196, 0.2)', 'rgba(44, 62, 80, 0.2)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientContainer}
+            >
+              <Ionicons name="information-circle" size={24} color="#4ECDC4" style={styles.infoIcon} />
+              <Text style={styles.placeholderMessageText}>
+                These are placeholder graphs. Once you use the tracker for the first time, this section will display your actual sleep results.
+              </Text>
+            </LinearGradient>
+          </BlurView>
+        </View>
+        
         {/* Sleep Quality Graph */}
         <SleepQualityGraph />
 
@@ -73,6 +93,33 @@ const styles = StyleSheet.create({
   scrollContainer: {
     backgroundColor: "#121212",
     marginBottom: 100,
+  },
+  placeholderMessageContainer: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+    borderRadius: 15,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(78, 205, 196, 0.3)',
+  },
+  blurContainer: {
+    overflow: 'hidden',
+    borderRadius: 15,
+  },
+  gradientContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 15,
+  },
+  infoIcon: {
+    marginRight: 10,
+  },
+  placeholderMessageText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    flex: 1,
+    lineHeight: 20,
   },
   topBar: {
     backgroundColor: "#121212",

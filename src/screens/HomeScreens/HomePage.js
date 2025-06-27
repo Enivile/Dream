@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, Image, StyleSheet, Dimensions, Animated, TouchableOpacity, FlatList, Text, ScrollView, Alert, ActivityIndicator, ImageBackground } from "react-native";
 import Swiper from 'react-native-swiper';
 import { StatusBar } from 'react-native';
@@ -29,6 +29,14 @@ const HomePage = () => {
       try {
         setLoadingIds((prev) => [...prev, item.id]);
         
+        // Check if this sound is already in the mini player
+        const isAlreadyAdded = miniPlayerSounds.some((s) => s.id === item.id);
+        if (isAlreadyAdded) {
+          // Sound is already playing, no need to add it again
+          setLoadingIds((prev) => prev.filter((id) => id !== item.id));
+          return;
+        }
+        
         const fileInfo = await FileSystem.getInfoAsync(localUri);
         let uri = localUri;
         
@@ -36,14 +44,11 @@ const HomePage = () => {
           uri = await downloadAudioFromFirebase(item.firebasePath, fileName);
         }
 
-        const isAlreadyAdded = miniPlayerSounds.some((s) => s.id === item.id);
-        if (!isAlreadyAdded) {
-          const updatedSounds = [...miniPlayerSounds, { ...item, uri }];
-          updateMiniPlayerSounds(updatedSounds);
-          showMiniPlayer(updatedSounds);
-        }
-
-        navigation.navigate("MainPlayer");
+        // Add the sound to the mini player and show it (without navigating to MainPlayer)
+        const updatedSounds = [...miniPlayerSounds, { ...item, uri }];
+        updateMiniPlayerSounds(updatedSounds);
+        showMiniPlayer(updatedSounds);
+        
       } catch (error) {
         Alert.alert("Download failed", error.message || "An error occurred while downloading.");
       } finally {
@@ -80,43 +85,7 @@ const HomePage = () => {
       { id: "4", source: require("../../../assets/images/icons/premium.png"), label: "Premium" },
     ];
 
-    const items = [
-      {
-        id: 1,
-        title: 'Feel Better: Drift Into Peaceful Nights',
-        category: 'Collections',
-        image: require('../../../assets/images/banners/Recently_Updated_5.webp'), // Use require here
-        count: '7 items',
-      },
-      {
-        id: 2,
-        title: 'Thanksgiving Meditation',
-        category: 'Meditation',
-        image: require('../../../assets/images/banners/Recently_Updated_2.webp'), // Use require here
-        count: '6 MIN',
-      },
-      {
-        id: 3,
-        title: 'Feel Better: Drift Into Peaceful Nights',
-        category: 'Collections',
-        image: require('../../../assets/images/banners/Recently_Updated_3.webp'), // Use require here
-        count: '7 items',
-      },
-      {
-        id: 4,
-        title: 'Thanksgiving Meditation',
-        category: 'Meditation',
-        image: require('../../../assets/images/banners/Recently_Updated_4.webp'), // Use require here
-        count: '6 MIN',
-      },
-      {
-        id: 5,
-        title: 'Feel Better: Drift Into Peaceful Nights',
-        category: 'Collections',
-        image: require('../../../assets/images/banners/Recently_Updated_1.webp'), // Use require here
-        count: '7 items',
-      },
-    ];
+
 
     const data = [
       { 
@@ -127,11 +96,11 @@ const HomePage = () => {
       { 
         id: '2', 
         row1: { id: 'city1', name: 'City', category: 'Urban', icon: 'business-outline', screen: 'WNcity', firebasePath: 'whiteNoises/Highway.mp3' }, 
-        row2: { id: 'special1', name: 'Special', category: 'Special', icon: 'radio-outline', screen: 'WNspecial', firebasePath: 'whiteNoises/Pink_Noise.mp3' } 
+        row2: { id: 'train1', name: 'Train', category: 'Transport', icon: 'train-outline', screen: 'WNspecial', firebasePath: 'whiteNoises/Pink_Noise.mp3' } 
       },
       { 
         id: '3', 
-        row1: { id: 'mixes1', name: 'Mixes', category: 'Mixed', icon: 'musical-notes-outline', screen: 'WNmixes', firebasePath: 'whiteNoises/Guitar_Meditation.mp3' }, 
+        row1: { id: 'mixes1', name: 'Mixes', category: 'Mixed', icon: 'musical-notes-outline', screen: 'WNmixes' }, 
         row2: { id: 'Piano', name: 'Piano', category: 'Musical', icon: 'apps-outline', screen: 'WNall' , firebasePath: 'whiteNoises/Piano.mp3' } 
       }
     ];
@@ -161,7 +130,11 @@ const HomePage = () => {
               style={styles.iconContainer}
               onPress={() => {
                 if (item.label === 'Music') {
-                  navigation.navigate('AidsScreen');
+                  navigation.navigate('AidsScreen', { section: 2 });
+                } else if (item.label === 'White Noise') {
+                  navigation.navigate('AidsScreen', { section: 1 });
+                } else if (item.label === 'My List') {
+                  navigation.navigate('AidsScreen', { section: 0, subSection: 0 });
                 }
               }}
             >
@@ -204,47 +177,13 @@ const HomePage = () => {
         {/* -------------------------------------------------------------------------------------------------------------------------------------- */}
 
 
-        <View style={styles.recentlyUpdatedContainer}>
-          {/* Header Section */}
-          <View style={styles.recentlyUpdatedHeader}>
-            <Text style={styles.recentlyUpdatedTitle}>Recently Updated</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AidsScreen')}>
-              <Text style={styles.recentlyUpdatedSeeAll}>See All</Text>
-            </TouchableOpacity>
-          </View>
-          {/* Carousel Section */}
-          <FlatList
-          data={items}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View key={item.id} style={styles.recentlyUpdatedSlide}>
-                <Image
-                  source={item.image}
-                  style={styles.recentlyUpdatedCarousel2Image}
-                  resizeMode="cover"
-                />
-                <Text style={styles.recentlyUpdatedNewBadge}>NEW</Text>
-                <View style={styles.recentlyUpdatedTextContainer}>
-                  <Text style={styles.recentlyUpdatedCategory}>{item.category}</Text>
-                  <Text style={styles.recentlyUpdatedEntryTitle}>{item.title}</Text>
-                  <Text style={styles.recentlyUpdatedEntryDetails}>{item.count}</Text>
-                </View>
-              </View>
-          )}
-          contentContainerStyle={styles.recentlyUpdatedCarousel}
-          decelerationRate='normal' // Smooth scrolling
-        />
-        </View>
-
         {/* -------------------------------------------------------------------------------------------------------------------------------------- */}
 
         <View style={styles.noiseContainer}>
           {/* Header Section */}
           <View style={styles.noiseHeaderContainer}>
             <Text style={styles.noiseHeader}>White Noise</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AidsScreen')}>
+            <TouchableOpacity onPress={() => navigation.navigate('AidsScreen', { section: 1, subSection: 0 })}>
               <Text style={styles.noiseSeeAll}>See All</Text>
             </TouchableOpacity>
           </View>
@@ -305,7 +244,7 @@ const HomePage = () => {
           {/* Header Section */}
           <View style={styles.storyHeader}>
             <Text style={styles.storyTitle}>Stories</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('StoriesPage')}>
+            <TouchableOpacity onPress={() => navigation.navigate('AidsScreen', { section: 3 })}>
               <Text style={styles.storySeeAll}>See All</Text>
             </TouchableOpacity>
           </View>
@@ -571,77 +510,6 @@ const styles = StyleSheet.create({
     bottom: -15,
     alignSelf: "center",
     flexDirection: "row",
-  },
-
-  // ------------------------------------------------------------------------------------------
-  
-  recentlyUpdatedContainer: {
-    marginVertical: 20,
-    backgroundColor: '#000', // Matches your homepage theme
-  },
-  recentlyUpdatedHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-    paddingHorizontal: 20,
-  },
-  recentlyUpdatedTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FFF',
-  },
-  recentlyUpdatedSeeAll: {
-    fontSize: 14,
-    color: '#1E90FF',
-    fontWeight: '600',
-  },
-  recentlyUpdatedCarousel: {
-    paddingHorizontal: 10,
-    // paddingVertical: 20,
-    backgroundColor: "#000000",
-    // marginTop: 10,
-  },
-  recentlyUpdatedSlide: {
-    width: screenWidth - 32, // Keeps spacing consistent with paddingHorizontal
-    borderRadius: 10,
-    overflow: 'hidden',
-    backgroundColor: '#333',
-    alignSelf: 'center',
-    marginHorizontal: 10,
-  },
-  recentlyUpdatedCarousel2Image: {
-    width: '100%',
-    height: 120,
-  },
-  recentlyUpdatedNewBadge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: 'red',
-    color: '#FFF',
-    fontSize: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    fontWeight: 'bold',
-  },
-  recentlyUpdatedTextContainer: {
-    padding: 10,
-  },
-  recentlyUpdatedCategory: {
-    fontSize: 12,
-    color: '#999',
-    marginBottom: 5,
-  },
-  recentlyUpdatedEntryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFF',
-  },
-  recentlyUpdatedEntryDetails: {
-    fontSize: 12,
-    color: '#CCC',
   },
 
   // -----------------------------------------------------------------------------------------------------

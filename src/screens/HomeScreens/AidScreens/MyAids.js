@@ -7,6 +7,8 @@ const MyAids = () => {
       <View style={styles.menuItemContainer}>
         <Text style={styles.menuItem}>My Aids</Text>
       </View>
+      {/* Spacer to prevent content from being hidden behind navbar */}
+      <View style={styles.navbarSpacer} />
     </ScrollView>)
 
 };
@@ -30,5 +32,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "gray",
     },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
+  },
 });
 export default MyAids

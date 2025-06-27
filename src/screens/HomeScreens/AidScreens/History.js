@@ -268,6 +268,7 @@ const History = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderHistoryItem}
         contentContainerStyle={styles.listContainer}
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
@@ -403,6 +404,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     marginLeft: 6,
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 });
 

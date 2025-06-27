@@ -250,6 +250,7 @@ const WNall = () => {
           </View>
         )}
         contentContainerStyle={styles.gridListContainer}
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
@@ -292,6 +293,9 @@ const styles = StyleSheet.create({
     textAlign: "center", // Center text
     width: 70, // Fixed width for text container
     height: 30, // Fixed height for text area
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 
 });

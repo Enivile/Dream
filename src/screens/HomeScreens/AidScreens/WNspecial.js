@@ -93,6 +93,7 @@ const WNspecial = () => {
           </View>
         )}
         contentContainerStyle={styles.gridListContainer}
+        ListFooterComponent={<View style={styles.navbarSpacer} />}
       />
     </View>
   );
@@ -123,6 +124,9 @@ const styles = StyleSheet.create({
     color: "white",
     marginTop: 5,
     fontSize: 12,
+  },
+  navbarSpacer: {
+    height: 105, // Same height as the navbar
   },
 });
 

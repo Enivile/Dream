@@ -8,15 +8,16 @@ import WNnature from "./AidScreens/WNnature";
 import WNanimal from "./AidScreens/WNanimal";
 import WNcity from "./AidScreens/WNcity";
 import WNspecial from "./AidScreens/WNspecial";
-import RecentlyUpdatedPage from "./AidScreens/RecentlyUpdatedPage";
+
 import MusicPage from "./AidScreens/MusicPage";
+import StoriesPage from "./AidScreens/StoriesPage";
 import Favorites from "./AidScreens/Favorites";
 import History from "./AidScreens/History";
 
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
 
-const mainMenu = ['My Aids', 'White Noise', 'Music', 'Story', 'Recent Updates'];
+const mainMenu = ['My Aids', 'White Noise', 'Music', 'Story'];
 const myAidsSubMenu = ['Favorites', 'History'];
 const whiteNoiseSubMenu = ['All', 'Mixes', 'Rain', 'ASMR', 'Nature', 'Animal', 'City', 'Special'];
 
@@ -39,7 +40,7 @@ class DynamicPageContainer extends Component {
   };
 
   render() {
-    const { children, style, minHeight = 200 } = this.props;
+    const { children, style, minHeight = ScreenHeight - 100 } = this.props; // Use screen height minus header space
     const { contentHeight } = this.state;
     
     return (
@@ -48,7 +49,7 @@ class DynamicPageContainer extends Component {
           styles.dynamicContainer,
           style,
           { minHeight },
-          // Use measured height if available, otherwise use minHeight
+          // Use measured height if available, otherwise use calculated minHeight
           contentHeight ? { height: Math.max(contentHeight, minHeight) } : {}
         ]}
         onLayout={this.handleLayout}
@@ -108,13 +109,9 @@ class SubSectionNavigator extends Component {
       style={styles.subPage}
       onHeightChange={this.props.onHeightChange}
     >
-      <ScrollView 
-        contentContainerStyle={styles.subPageContent}
-        showsVerticalScrollIndicator={false}
-        scrollEnabled={index === this.state.activeSubIndex}
-      >
+      <View style={styles.subPageContent}>
         {component}
-      </ScrollView>
+      </View>
     </DynamicPageContainer>
   );
 
@@ -169,6 +166,43 @@ export default class ImprovedAidsScreen extends Component {
       sectionHeights: {} // Track heights of different sections
     };
     this.scrollViewRef = React.createRef();
+    this.subSectionRefs = {}; // Store refs to SubSectionNavigator components
+  }
+
+  componentDidMount() {
+    // Check if we have route params for navigation
+    this.handleRouteParams();
+  }
+
+  componentDidUpdate(prevProps) {
+    // Check if route params have changed
+    if (prevProps.route?.params !== this.props.route?.params) {
+      this.handleRouteParams();
+    }
+  }
+
+  handleRouteParams = () => {
+    const { route } = this.props;
+    if (route?.params) {
+      const { section, subSection } = route.params;
+      
+      // Navigate to main section if specified
+      if (section !== undefined && section >= 0 && section < mainMenu.length) {
+        this.handleMenuPress(section);
+        
+        // If this is a section with sub-sections and a subSection is specified
+        if ((section === 0 || section === 1) && subSection !== undefined) {
+          // We need to wait for the main scroll to complete before scrolling the sub-section
+          setTimeout(() => {
+            // Find the SubSectionNavigator component and call its handleSubMenuPress method
+            const subNavigator = this.subSectionRefs[section];
+            if (subNavigator && typeof subNavigator.handleSubMenuPress === 'function') {
+              subNavigator.handleSubMenuPress(subSection);
+            }
+          }, 300); // Small delay to ensure main scroll completes first
+        }
+      }
+    }
   }
 
   handleScroll = (event) => {
@@ -242,7 +276,7 @@ export default class ImprovedAidsScreen extends Component {
     ];
 
     return (
-      <ScrollView contentContainerStyle={styles.mainContainer}>
+      <View style={styles.mainContainer}>
         <ImageBackground
           source={require('../../../assets/images/banners/aids-main-back.webp')}
           style={styles.mainBannerImage}
@@ -271,6 +305,7 @@ export default class ImprovedAidsScreen extends Component {
             {/* My Aids Page */}
             {this.renderMainPage(
               <SubSectionNavigator
+                ref={(ref) => this.subSectionRefs[0] = ref}
                 subMenu={myAidsSubMenu}
                 components={myAidsComponents}
                 onScrollStateChange={this.handleScrollStateChange}
@@ -283,6 +318,7 @@ export default class ImprovedAidsScreen extends Component {
             {/* White Noise Page */}
             {this.renderMainPage(
               <SubSectionNavigator
+                ref={(ref) => this.subSectionRefs[1] = ref}
                 subMenu={whiteNoiseSubMenu}
                 components={whiteNoiseComponents}
                 onScrollStateChange={this.handleScrollStateChange}
@@ -297,9 +333,9 @@ export default class ImprovedAidsScreen extends Component {
               <DynamicPageContainer 
                 onHeightChange={(height) => this.handleSectionHeightChange('music', height)}
               >
-                <ScrollView contentContainerStyle={styles.singlePageContent}>
+                <View style={styles.singlePageContent}>
                   <MusicPage />
-                </ScrollView>
+                </View>
               </DynamicPageContainer>,
               2,
               'music'
@@ -310,37 +346,25 @@ export default class ImprovedAidsScreen extends Component {
               <DynamicPageContainer 
                 onHeightChange={(height) => this.handleSectionHeightChange('story', height)}
               >
-                <ScrollView contentContainerStyle={styles.singlePageContent}>
-                  <View style={styles.emptyPage}>
-                    <Text style={styles.emptyText}>Coming Soon</Text>
-                  </View>
-                </ScrollView>
+                <View style={styles.singlePageContent}>
+                  <StoriesPage />
+                </View>
               </DynamicPageContainer>,
               3,
               'story'
             )}
 
-            {/* Recent Updates Page */}
-            {this.renderMainPage(
-              <DynamicPageContainer 
-                onHeightChange={(height) => this.handleSectionHeightChange('recentUpdates', height)}
-              >
-                <ScrollView contentContainerStyle={styles.singlePageContent}>
-                  <RecentlyUpdatedPage />
-                </ScrollView>
-              </DynamicPageContainer>,
-              4,
-              'recentUpdates'
-            )}
+
           </ScrollView>
         </ImageBackground>
-      </ScrollView>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
   mainContainer: {
+    flex: 1,
     backgroundColor: "#121212",
   },
   mainScrollContainer: {
@@ -380,13 +404,14 @@ const styles = StyleSheet.create({
   },
   mainPageScrollContainer: {
     marginTop: 10,
-    // Remove flexGrow: 0 to allow dynamic sizing
+    height: ScreenHeight - 100, // Ensure container has proper height
   },
   mainPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    // Remove fixed height constraints
-    minHeight: 200,
+    // Use full available height minus header space
+    minHeight: ScreenHeight - 400,
+    height: ScreenHeight - 400,
   },
   subSectionContainer: {
     flex: 1,
@@ -398,20 +423,22 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   subPagesContainer: {
-    // Remove flexGrow: 0 and alignItems to allow dynamic sizing
+    // Ensure proper height for sub-pages container
     alignItems: 'flex-start',
+    height: ScreenHeight - 100, // Account for main menu and sub-menu heights
   },
   subPage: {
     backgroundColor: 'transparent',
     width: ScreenWidth,
-    // Remove fixed height constraints
+    // Use full available height for sub-pages
+    minHeight: ScreenHeight - 100, // Account for sub-menu height
   },
   subPageContent: {
-    flexGrow: 1,
+    flex: 1,
     paddingBottom: 20,
   },
   singlePageContent: {
-    flexGrow: 1,
+    flex: 1,
     paddingBottom: 20,
   },
   dynamicContainer: {
